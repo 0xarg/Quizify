@@ -25,6 +25,11 @@
                 console.log('We are Logged in')
                 const data = await res.json()
                 console.log(data)
+
+                // Storing the token to authorize with each request
+                localStorage.setItem('user',JSON.stringify(data))
+                this.$store.commit('setUser')
+                this.$router.push('/')
                     
                     
                     

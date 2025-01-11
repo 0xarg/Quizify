@@ -17,8 +17,7 @@ def login():
     email = data.get('email')           # To ignore error --> use get else direct data['email]
     password = data.get('password')
     
-    print(email)
-    print(password)
+    
     if not email or not password:
         return jsonify({"message":"Invalid Inputs"}), 404
     

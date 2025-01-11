@@ -1,14 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import Home from '../views/Home.vue'
 import Login from "../views/Login.vue";
 import Ping from "../views/Ping.vue";
+import store from '@/store';
+import AdminDash from '@/views/Admin-Dash.vue';
+import SubjectList from '@/views/SubjectList.vue';
 
 const routes = [
-  // {
-  //   path: "/",
-  //   name: "home",
-  //   component: HomeView,
-  // },
+  {
+    path: "/",
+    name: "home",
+    component: Home,
+    meta :{
+      requiresLogin: true
+    }
+  },
   {
     path: "/about",
     name: "about",
@@ -20,6 +26,14 @@ const routes = [
     },
   },
   {
+    path: "/dashboard",
+    name: "dash",
+    component: AdminDash,
+    meta: {
+      requiresLogin: true,
+      role: "admin" },
+  },
+  {
     path: "/login",
     name: "Login",
     component: Login,
@@ -29,6 +43,11 @@ const routes = [
     name: "ping",
     component: Ping,
   },
+  {
+    path: "/subjects",
+    name: "SubjectList",
+    component: SubjectList,
+  },
 ];
 
 const router = createRouter({
@@ -36,4 +55,20 @@ const router = createRouter({
   routes
 })
 
+router.beforeEach((to,from,next) => {
+  if (to.matched.some((record)=>record.meta.requiresLogin)) {
+    if (!store.state.loggedIn){
+      next ({path: '/login'});
+    } else if(to.meta.role && (to.meta.role != store.state.roles)) {
+      alert("Only Authorized Users has Access to this Page. Redirecting to Home.....")
+      next({path:'/'})
+    } else {
+      next();
+    }
+  }
+  else{
+    next();
+  }
+  
+})
 export default router
