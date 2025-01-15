@@ -1,10 +1,10 @@
 <template>
     <div>
-        <h2> {{ name }}</h2>
+        <span>Name of the Subject: <h2 style="display: inline;">{{ name }}</h2></span>
+        <p>Description: {{ description }}</p>
+        
+        <p>Id: {{ subject_id }}</p>
         <hr>
-        <p>{{ description }}</p>
-
-        <p>{{ subject_id }}</p>
     </div>
 </template>
 
@@ -13,6 +13,7 @@
         name: 'SubjectCard',
         props: ["name","description","subject_id"]
     }
+    console.log('SC added')
 </script>
 
 <style scoped>

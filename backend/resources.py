@@ -62,6 +62,7 @@ class SubjectListAPI(Resource):
         description = data.get("description")
         subject = Subject(name = name, description = description)
         
+        
         try:
             db.session.add(subject)
             db.session.commit()

@@ -11,7 +11,7 @@
 import SubjectCard from '@/components/SubjectCard.vue'
 export default {
         name:'SubjectList',
-        component: {
+        components: {
             SubjectCard
         },
         data(){

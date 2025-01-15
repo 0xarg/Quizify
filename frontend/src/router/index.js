@@ -5,6 +5,7 @@ import Ping from "../views/Ping.vue";
 import store from '@/store';
 import AdminDash from '@/views/Admin-Dash.vue';
 import SubjectList from '@/views/SubjectList.vue';
+import AddSubject from '@/views/AddSubject.vue'
 
 const routes = [
   {
@@ -44,9 +45,14 @@ const routes = [
     component: Ping,
   },
   {
-    path: "/subjects",
+    path: "/api/subjects",
     name: "SubjectList",
     component: SubjectList,
+  },
+  {
+    path: "/add-subjects",
+    name: "AddSubject",
+    component: AddSubject,
   },
 ];
 
