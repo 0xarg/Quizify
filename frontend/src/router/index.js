@@ -6,15 +6,20 @@ import store from '@/store';
 import AdminDash from '@/views/Admin-Dash.vue';
 import SubjectList from '@/views/SubjectList.vue';
 import AddSubject from '@/views/AddSubject.vue'
+import SubjectDisplay from '@/views/SubjectDisplay.vue';
+import ChapterList from '@/views/ChapterList.vue';
+import ChapterDisplay from '@/views/ChapterDisplay.vue';
+import AddChapter from '@/views/AddChapter.vue';
+import SubjectChapters from '@/views/SubjectChapters.vue';
 
 const routes = [
   {
     path: "/",
     name: "home",
     component: Home,
-    meta :{
-      requiresLogin: true
-    }
+    meta: {
+      requiresLogin: true,
+    },
   },
   {
     path: "/about",
@@ -32,7 +37,8 @@ const routes = [
     component: AdminDash,
     meta: {
       requiresLogin: true,
-      role: "admin" },
+      role: "admin",
+    },
   },
   {
     path: "/login",
@@ -53,6 +59,38 @@ const routes = [
     path: "/add-subjects",
     name: "AddSubject",
     component: AddSubject,
+  },
+  {
+    path: "/Subject/:id",
+    name: "SubjectDisplay",
+    component: SubjectDisplay,
+    props: true
+  },
+  {
+    path: "/Chapters/:id",
+    name: "ChapterList",
+    component: ChapterList,
+    props: true
+  },
+  {
+    path: "/AddChapter/:id",
+    name: "AddChapter",
+    component: AddChapter,
+    props: true
+  },
+  {
+    path: "/Chapter/:chapter_id",
+    name: "Chapter",
+    component: ChapterDisplay,
+    props: (route) =>({
+      chapter_id: route.params.chapter_id,
+      subject_id: route.query.subject_id
+    })
+  },
+  {
+    path: "/AllSubjects/",
+    name: "AllSubjects",
+    component: SubjectChapters,
   },
 ];
 

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <span>Name of the Subject: <h2 style="display: inline;">{{ name }}</h2></span>
+        <h2 @click ="$router.push('/Subject/'+ subject_id)">{{ name }}</h2>
         <p>Description: {{ description }}</p>
         
         <p>Id: {{ subject_id }}</p>
@@ -13,7 +13,6 @@
         name: 'SubjectCard',
         props: ["name","description","subject_id"]
     }
-    console.log('SC added')
 </script>
 
 <style scoped>
