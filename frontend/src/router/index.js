@@ -51,7 +51,7 @@ const routes = [
     component: Ping,
   },
   {
-    path: "/api/subjects",
+    path: "/subjects",
     name: "SubjectList",
     component: SubjectList,
   },

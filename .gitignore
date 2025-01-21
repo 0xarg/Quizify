@@ -1,3 +1,4 @@
-frontend/.gitignore
+node_modules
 .quizify
 __pycache__/
+
