@@ -11,6 +11,10 @@ import ChapterList from '@/views/ChapterList.vue';
 import ChapterDisplay from '@/views/ChapterDisplay.vue';
 import AddChapter from '@/views/AddChapter.vue';
 import SubjectChapters from '@/views/SubjectChapters.vue';
+import AddQuiz from '@/views/AddQuiz.vue';
+import QuizList from '@/views/QuizList.vue';
+import QuizView from '@/views/QuizDisplay.vue';
+import QuizDisplay from '@/views/QuizDisplay.vue';
 
 const routes = [
   {
@@ -64,33 +68,62 @@ const routes = [
     path: "/Subject/:id",
     name: "SubjectDisplay",
     component: SubjectDisplay,
-    props: true
+    props: true,
   },
   {
     path: "/Chapters/:id",
     name: "ChapterList",
     component: ChapterList,
-    props: true
+    props: true,
   },
   {
     path: "/AddChapter/:id",
     name: "AddChapter",
     component: AddChapter,
-    props: true
+    props: true,
   },
   {
     path: "/Chapter/:chapter_id",
     name: "Chapter",
     component: ChapterDisplay,
-    props: (route) =>({
+    props: (route) => ({
       chapter_id: route.params.chapter_id,
-      subject_id: route.query.subject_id
-    })
+      sid: route.query.sid,
+    }),
   },
   {
     path: "/AllSubjects/",
     name: "AllSubjects",
     component: SubjectChapters,
+  },
+  {
+    path: "/AddQuiz/:chapter_id",
+    name: "AddQuiz",
+    component: AddQuiz,
+    props: (route) => ({
+      chapter_id: route.params.chapter_id,
+      sid: route.query.sid,
+    }),
+  },
+  {
+    path: "/AllSubjects/",
+    name: "AllSubjects",
+    component: SubjectChapters,
+  },
+  {
+    path: "/Quizes/:chapter_id",
+    name: "QuizList",
+    component: QuizList,
+    props: true,
+  },
+  {
+    path: "/Quiz/:quiz_id",
+    name: "Quiz",
+    component: QuizDisplay,
+    props: (route) => ({
+      quiz_id: route.params.quiz_id,
+      cid: route.query.cid,
+    }),
   },
 ];
 
