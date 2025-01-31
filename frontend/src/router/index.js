@@ -15,6 +15,7 @@ import AddQuiz from '@/views/AddQuiz.vue';
 import QuizList from '@/views/QuizList.vue';
 import QuizView from '@/views/QuizDisplay.vue';
 import QuizDisplay from '@/views/QuizDisplay.vue';
+import AddQuestion from '@/views/AddQuestion.vue';
 
 const routes = [
   {
@@ -124,6 +125,12 @@ const routes = [
       quiz_id: route.params.quiz_id,
       cid: route.query.cid,
     }),
+  },
+  {
+    path: "/Quiz/:quiz_id/questions",
+    name: "AddQuestion",
+    component: AddQuestion,
+    props: true,
   },
 ];
 

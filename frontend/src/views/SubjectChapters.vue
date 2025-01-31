@@ -2,7 +2,6 @@
     <div>
         <h1>All Subjects and their Chapters 📚</h1>
         <div v-for="subject in subjects">
-
             <h3 @click ="$router.push('/Subject/'+ subject.id)" style="cursor:pointer;">{{ subject.name }}</h3>
             <ol >
                 <li v-for="chapter in subject.chapters" 

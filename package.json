@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "html-duration-picker": "^2.4.0",
+    "vue3-timepicker": "^1.0.0-beta.2"
+  }
+}

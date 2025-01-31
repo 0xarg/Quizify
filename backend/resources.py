@@ -1,3 +1,4 @@
+import re
 from flask import jsonify, request, current_app as app
 from flask_restful import Api, Resource, fields, marshal_with
 from models import *
@@ -34,10 +35,7 @@ subject_fields = {
 question_fields = {
     "id": fields.Integer,
     "statement": fields.String,
-    "option_1": fields.String,
-    "option_2": fields.String,
-    "option_3": fields.String,
-    "option_4": fields.String,
+    "options": fields.List(fields.String, attribute=lambda q: [q.option_1, q.option_2, q.option_3, q.option_4]),
     "correct_answer": fields.String,
 }
 
@@ -51,7 +49,7 @@ score_fields = {
 quiz_fields = {
     "id": fields.Integer,
     "chapter.name": fields.String,
-    "date": fields.DateTime,
+    "date": fields.String(attribute=lambda q: q.date.strftime("%A, %d %b %Y")),
     "duration": TimeField,
     "remarks": fields.String,
     "questions": fields.List(fields.Nested(question_fields)),
@@ -209,6 +207,7 @@ class QuizAPI(Resource):
         if not quiz:
             print("Quiz not Found")
             return jsonify({'message': 'Quiz not Found'}), 404
+        
         return quiz
 
     @auth_required('token')
@@ -255,12 +254,18 @@ class QuizListAPI(Resource):
 
     # @auth_required('token')
     def post(self, chapter_id):
-        print()
+        print("ok")
         data = request.get_json()
         remarks = data.get("remarks")
         duration = data.get("duration")
-        duration = datetime.strptime(duration, '%H:%M:%S').time()
-
+        
+        if not isinstance(duration, str) or not re.match(r'^\d{2}:\d{2}:\d{2}$', duration):
+            return {"message": "Duration must be in the format HH:MM:SS"},400
+        
+        try:
+           duration = datetime.strptime(duration, '%H:%M:%S').time()
+        except ValueError:
+            return{"message":"Invalid Time Format"},401
         quiz = Quiz(remarks=remarks, duration=duration,
                     chapter_id=chapter_id)
 
@@ -275,6 +280,46 @@ class QuizListAPI(Resource):
             return jsonify({'message': 'Error Adding Quiz'}), 500
 
 
+
+class QuestionAPI(Resource):
+    @auth_required('token')
+    @marshal_with(question_fields)
+    def get(self, question_id):
+        question = Questions.query.get(question_id)
+        
+        if not question:
+            return {"message":"Question Not Found"}
+        question_data = {
+            "id": question.id,
+            
+            "statement":question.statement,
+            "options": [question.option_1, question.option_2, question.option_3, question.option_4],
+            "correct_answer": question.correct_answer
+        }
+        return question_data
+    
+class AddQuestionAPI(Resource):
+    def post(self,quiz_id):
+        data = request.get_json()
+        statement = data.get("statement")
+        option_1 = data.get("option_1")
+        option_2 = data.get("option_2")
+        option_3 = data.get("option_3")
+        option_4 = data.get("option_4")
+        correct_answer = data.get("correct_answer")
+        question  = Questions(quiz_id = quiz_id, statement=statement,option_1=option_1,option_2=option_2,option_3=option_3,option_4=option_4,correct_answer=correct_answer)
+        
+        try:
+            db.session.add(question)
+            db.session.commit()
+            return jsonify({'message':'Question Added'})
+        except:
+            db.session.rollback()
+            return jsonify({"message":"Error Adding question !"})
+    
+    
+    
+    
 api.add_resource(SubjectAPI, "/subjects/<int:subject_id>")
 api.add_resource(SubjectListAPI, "/subjects")
 
@@ -285,3 +330,5 @@ api.add_resource(ChapterListAPI, "/chapters/<int:subject_id>")
 
 api.add_resource(QuizAPI, "/quiz/<int:quiz_id>")
 api.add_resource(QuizListAPI, "/quizes/<int:chapter_id>")
+
+api.add_resource(AddQuestionAPI,"/question/<int:quiz_id>")
