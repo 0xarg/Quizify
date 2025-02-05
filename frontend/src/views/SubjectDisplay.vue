@@ -4,7 +4,7 @@
         <hr>
         <h4>{{ subject.description }}</h4>
 
-        <button @click = "$router.push('/AddChapter/'+ subject.id)"> Add Chapter </button>
+        <button @click = "$router.push('/AddChapter/'+ subject.id)" v-if="$store.state.roles == 'admin'"> Add Chapter </button>
         <hr>
         <button @click = "$router.push('/Chapters/'+ subject.id)"> View Chapters </button>
         

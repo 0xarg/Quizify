@@ -2,7 +2,7 @@ import re
 from flask import jsonify, request, current_app as app
 from flask_restful import Api, Resource, fields, marshal_with
 from models import *
-from flask_security import auth_required, current_user
+from flask_security import auth_required, current_user 
 
 
 from datetime import time
@@ -37,6 +37,7 @@ question_fields = {
     "statement": fields.String,
     "options": fields.List(fields.String, attribute=lambda q: [q.option_1, q.option_2, q.option_3, q.option_4]),
     "correct_answer": fields.String,
+    "marks": fields.Float
 }
 
 score_fields = {
@@ -307,7 +308,8 @@ class AddQuestionAPI(Resource):
         option_3 = data.get("option_3")
         option_4 = data.get("option_4")
         correct_answer = data.get("correct_answer")
-        question  = Questions(quiz_id = quiz_id, statement=statement,option_1=option_1,option_2=option_2,option_3=option_3,option_4=option_4,correct_answer=correct_answer)
+        marks = data.get("marks")
+        question  = Questions(quiz_id = quiz_id, statement=statement,option_1=option_1,option_2=option_2,option_3=option_3,option_4=option_4,correct_answer=correct_answer,marks=marks)
         
         try:
             db.session.add(question)
@@ -317,7 +319,20 @@ class AddQuestionAPI(Resource):
             db.session.rollback()
             return jsonify({"message":"Error Adding question !"})
     
-    
+
+class SubmitQuizAPI(Resource):
+    def post(self,quiz_id):
+        data = request.get_json()
+        total_score = data.get("total_marks")
+        score = Scores(user_id = current_user.id, quiz_id = quiz_id, total_score = total_score)
+        try:
+            db.session.add(score)
+            db.session.commit()
+            return jsonify({'message': 'Score Added'})
+        except:
+            db.session.rollback()
+            return jsonify({"message": "Error Adding Score !"})
+            
     
     
 api.add_resource(SubjectAPI, "/subjects/<int:subject_id>")
@@ -332,3 +347,4 @@ api.add_resource(QuizAPI, "/quiz/<int:quiz_id>")
 api.add_resource(QuizListAPI, "/quizes/<int:chapter_id>")
 
 api.add_resource(AddQuestionAPI,"/question/<int:quiz_id>")
+api.add_resource(SubmitQuizAPI,"/SubmitQuiz/<int:quiz_id>")

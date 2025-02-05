@@ -3,7 +3,7 @@ import Home from '../views/Home.vue'
 import Login from "../views/Login.vue";
 import Ping from "../views/Ping.vue";
 import store from '@/store';
-import AdminDash from '@/views/Admin-Dash.vue';
+import AdminDash from '@/views/Dashboard.vue';
 import SubjectList from '@/views/SubjectList.vue';
 import AddSubject from '@/views/AddSubject.vue'
 import SubjectDisplay from '@/views/SubjectDisplay.vue';
@@ -16,6 +16,7 @@ import QuizList from '@/views/QuizList.vue';
 import QuizView from '@/views/QuizDisplay.vue';
 import QuizDisplay from '@/views/QuizDisplay.vue';
 import AddQuestion from '@/views/AddQuestion.vue';
+import QuizTake from '@/views/QuizTake.vue';
 
 const routes = [
   {
@@ -42,7 +43,7 @@ const routes = [
     component: AdminDash,
     meta: {
       requiresLogin: true,
-      role: "admin",
+      role: ["admin","user"],
     },
   },
   {
@@ -89,7 +90,7 @@ const routes = [
     component: ChapterDisplay,
     props: (route) => ({
       chapter_id: route.params.chapter_id,
-      sid: route.query.sid,
+      sid: route.query.subject_id,
     }),
   },
   {
@@ -117,10 +118,20 @@ const routes = [
     component: QuizList,
     props: true,
   },
+  
   {
     path: "/Quiz/:quiz_id",
     name: "Quiz",
     component: QuizDisplay,
+    props: (route) => ({
+      quiz_id: route.params.quiz_id,
+      cid: route.query.cid,
+    }),
+  },
+  {
+    path: "/TakeQuiz/:quiz_id",
+    name: "QuizTake",
+    component: QuizTake,
     props: (route) => ({
       quiz_id: route.params.quiz_id,
       cid: route.query.cid,
@@ -143,9 +154,14 @@ router.beforeEach((to,from,next) => {
   if (to.matched.some((record)=>record.meta.requiresLogin)) {
     if (!store.state.loggedIn){
       next ({path: '/login'});
-    } else if(to.meta.role && (to.meta.role != store.state.roles)) {
-      alert("Only Authorized Users has Access to this Page. Redirecting to Home.....")
-      next({path:'/'})
+    } else if (
+      to.meta.role &&
+      !to.meta.role.some((role) => store.state.roles.includes(role))
+    ) {
+      alert(
+        "Only Authorized Users has Access to this Page. Redirecting to Home....."
+      );
+      next({ path: "/" });
     } else {
       next();
     }

@@ -1,7 +1,7 @@
 <template>
     <div>
         <h3>Add Quiz</h3>
-        <p>{{ this.sid }}</p>
+        <p>For Subject no.{{ sid }}</p>
         <label for="remarks">Remarks: </label>
         <input id="remarks" placeholder="remarks" v-model="remarks" />
         <br>
@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import VueTimepicker from 'vue3-timepicker'
 export default {
     name: 'AddQuiz',
     props: ["chapter_id", "sid"],

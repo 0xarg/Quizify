@@ -1,5 +1,6 @@
 <template>
     <div>
+        <br>
         <label >Question Statement: </label>
         <input type="text" v-model="statement"  placeholder="statement">
         <br>
@@ -18,6 +19,10 @@
         <br>
         <label >Option 4: </label>
         <input type="text" id="option_4" v-model="option_4" placeholder="Option 4">
+        <br>
+        <br>
+        <label >Marks for this Question: </label>
+        <input type="number" v-model="marks" placeholder="Mark">
         <br>
         <br>
         <label >Correct Option: </label>
@@ -47,6 +52,7 @@ export default {
             option_3: null,
             option_4: null,
             correct_answer: null,
+            marks: null,
 
         }
     },
@@ -56,7 +62,7 @@ export default {
                 const res = await fetch('http://localhost:5000/' + 'api/question/' + this.quiz_id, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authentication-Token': JSON.parse(localStorage.getItem('user')).token },
-                    body: JSON.stringify({ statement: this.statement, option_1: this.option_1, option_2: this.option_2, option_3: this.option_3, option_4: this.option_4, correct_answer: this.correct_answer })
+                    body: JSON.stringify({ statement: this.statement, option_1: this.option_1, option_2: this.option_2, option_3: this.option_3, option_4: this.option_4, correct_answer: this.correct_answer, marks:this.marks })
                 })
                 if (res.ok) {
                     const data = await res.json()

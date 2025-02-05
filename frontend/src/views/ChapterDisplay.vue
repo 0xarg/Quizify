@@ -4,8 +4,12 @@
         <h3>{{ chapter.description }}</h3>
         <h4> Chapter_id: {{ chapter_id }}</h4>
         <h4>Subject_id: {{ sid }}</h4>
-        <h5 @click="$router.push({name:'QuizList', params: {chapter_id: this.chapter_id}})" >View Quizes</h5>
-        <button @click ="$router.push({name:'AddQuiz', params: {chapter_id: this.chapter_id}, query:{sid:this.sid}})"> Add Quiz</button>
+        <a href="">
+            <h5 @click="$router.push({name:'QuizList', params: {chapter_id: this.chapter_id}})">View Quizes</h5>
+            <!-- <h5   v-if="$store.state.roles == 'user'" @click="$router.push({name:'QuizList', params: {chapter_id: this.chapter_id}})">View & Take Quizes</h5> -->
+        </a>
+        <button @click="$router.push({name:'AddQuiz', params: {chapter_id: this.chapter_id}, query:{sid:this.sid}})"
+            v-if="$store.state.roles =='admin'"> Add Quiz</button>
 
     </div>
 </template>

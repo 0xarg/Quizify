@@ -12,7 +12,7 @@ class LocalDevelopmentConfig(Config):
     SECURITY_PASSWORD_SALT = 'thisisprojectpassword'
     SECRET_KEY = 'shouldbekeptSecretforinternalreasons'
     SECURITY_TOKEN_AUTHENTICATION_HEADER = 'Authentication-Token'  #Default
-    SECURITY_TOKEN_MAX_AGE = 3600
+    SECURITY_TOKEN_MAX_AGE = 36000
     
     
     #Cache Specific...
