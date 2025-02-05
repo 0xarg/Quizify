@@ -323,7 +323,7 @@ class AddQuestionAPI(Resource):
 class SubmitQuizAPI(Resource):
     def post(self,quiz_id):
         data = request.get_json()
-        total_score = data.get("total_marks")
+        total_score = data.get("total_score")
         score = Scores(user_id = current_user.id, quiz_id = quiz_id, total_score = total_score)
         try:
             db.session.add(score)
