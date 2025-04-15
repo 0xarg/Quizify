@@ -59,7 +59,7 @@ export default {
     methods: {
         async AddQuestion() {
             try {
-                const res = await fetch('http://localhost:5000/' + 'api/question/' + this.quiz_id, {
+                const res = await fetch('http://localhost:5000/' + 'api/add/question/' + this.quiz_id, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authentication-Token': JSON.parse(localStorage.getItem('user')).token },
                     body: JSON.stringify({ statement: this.statement, option_1: this.option_1, option_2: this.option_2, option_3: this.option_3, option_4: this.option_4, correct_answer: this.correct_answer, marks:this.marks })

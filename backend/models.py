@@ -75,6 +75,7 @@ class Scores(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     time = db.Column(db.DateTime, index = True, default = datetime.now())
     total_score = db.Column(db.Integer, nullable = True)
+    attempts = db.Column(db.Integer, nullable = False)
     
     
     

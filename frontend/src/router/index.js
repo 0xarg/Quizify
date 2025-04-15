@@ -17,6 +17,8 @@ import QuizView from '@/views/QuizDisplay.vue';
 import QuizDisplay from '@/views/QuizDisplay.vue';
 import AddQuestion from '@/views/AddQuestion.vue';
 import QuizTake from '@/views/QuizTake.vue';
+import EditQuestion from '@/views/EditQuestion.vue';
+import EditQuiz from '@/views/EditQuiz.vue';
 
 const routes = [
   {
@@ -43,7 +45,7 @@ const routes = [
     component: AdminDash,
     meta: {
       requiresLogin: true,
-      role: ["admin","user"],
+      role: ["admin", "user"],
     },
   },
   {
@@ -108,6 +110,15 @@ const routes = [
     }),
   },
   {
+    path: "/EditQuiz/:quiz_id",
+    name: "EditQuiz",
+    component: EditQuiz,
+    props: (route) => ({
+      quiz_id: route.params.quiz_id,
+      cid: route.query.cid,
+    }),
+  },
+  {
     path: "/AllSubjects/",
     name: "AllSubjects",
     component: SubjectChapters,
@@ -118,7 +129,7 @@ const routes = [
     component: QuizList,
     props: true,
   },
-  
+
   {
     path: "/Quiz/:quiz_id",
     name: "Quiz",
@@ -142,6 +153,15 @@ const routes = [
     name: "AddQuestion",
     component: AddQuestion,
     props: true,
+  },
+  {
+    path: "/Quiz/:quiz_id/:question_id",
+    name: "EditQuestion",
+    component: EditQuestion,
+    props: (route) => ({
+      question_id: route.params.question_id,
+      quiz_id: route.params.quiz_id,
+    }),
   },
 ];
 

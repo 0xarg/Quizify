@@ -5,7 +5,7 @@ from models import *
 from flask_security import auth_required, current_user 
 
 
-from datetime import time
+from datetime import time, datetime
 
 
 class TimeField(fields.Raw):
@@ -110,6 +110,7 @@ class SubjectListAPI(Resource):
     @marshal_with(subject_fields)
     def get(self):
         subjects = Subject.query.all()
+        print(subjects)
         return subjects
 
     def post(self):
@@ -228,15 +229,21 @@ class QuizAPI(Resource):
     @auth_required('token')
     def put(self, quiz_id):
         data = request.get_json()
-        name = data.get("name")
-        description = data.get("desription")
+        remarks = data.get("remarks")
+        duration = data.get("duration")
+        if not isinstance(duration, str) or not re.match(r'^\d{2}:\d{2}:\d{2}$', duration):
+            return {"message": "Duration must be in the format HH:MM:SS"},400
+        
+        try:
+           duration = datetime.strptime(duration, '%H:%M:%S').time()
+        except ValueError:
+            return{"message":"Invalid Time Format"},401
+        quiz = Quiz.query.get(quiz_id)
+        if not quiz:
+            return jsonify({'message': 'Quiz not Found'}), 404
 
-        chapter = Quiz.query.get(quiz_id)
-        if not chapter:
-            return jsonify({'message': 'Chapter not Found'}), 404
-
-        chapter.name = name
-        chapter.description = description
+        quiz.remarks = remarks
+        quiz.duration = duration
         try:
             db.session.commit()
             return jsonify({'message': 'Succesfully Edited Chapter Details'})
@@ -287,19 +294,40 @@ class QuestionAPI(Resource):
     @marshal_with(question_fields)
     def get(self, question_id):
         question = Questions.query.get(question_id)
-        
         if not question:
             return {"message":"Question Not Found"}
-        question_data = {
-            "id": question.id,
-            
-            "statement":question.statement,
-            "options": [question.option_1, question.option_2, question.option_3, question.option_4],
-            "correct_answer": question.correct_answer
-        }
-        return question_data
-    
-class AddQuestionAPI(Resource):
+        return question
+
+    @auth_required('token')
+    def put(self, question_id):
+        data = request.get_json()
+        statement = data.get("statement")
+        option_1 = data.get("option_1")
+        option_2 = data.get("option_2")
+        option_3 = data.get("option_3")
+        option_4 = data.get("option_4")
+        correct_answer = data.get("correct_answer")
+        marks = data.get("marks")
+        question = Questions.query.get(question_id)
+        if not question:
+            return jsonify({'message': 'Question not Found'}), 404
+
+        question.statement = statement
+        question.option_1 = option_1
+        question.option_2 = option_2
+        question.option_3 = option_3
+        question.option_4 = option_4
+        question.correct_answer = correct_answer
+        question.marks = marks
+        
+        try:
+            db.session.commit()
+            return jsonify({'message': 'Succesfully Edited Question'})
+        except:
+            db.session.rollback()
+            return jsonify({'message': 'Error Editing Question'}), 500
+
+class AddQuestionAPI(Resource):     
     def post(self,quiz_id):
         data = request.get_json()
         statement = data.get("statement")
@@ -324,11 +352,23 @@ class SubmitQuizAPI(Resource):
     def post(self,quiz_id):
         data = request.get_json()
         total_score = data.get("total_score")
-        score = Scores(user_id = current_user.id, quiz_id = quiz_id, total_score = total_score)
+        # Check if user exists:
+        existing_user = Scores.query.filter_by(user_id = current_user.id, quiz_id = quiz_id).first()
+        
+        
         try:
-            db.session.add(score)
-            db.session.commit()
-            return jsonify({'message': 'Score Added'})
+            if existing_user:
+                existing_user.total_score = total_score
+                existing_user.attempts += 1
+                existing_user.time = datetime.now()
+                db.session.commit()
+                return jsonify({'message': 'Score Updated'})
+            else:
+                score = Scores(user_id = current_user.id, quiz_id = quiz_id, total_score = total_score, attempts = 1)
+                db.session.add(score)
+                db.session.commit()
+                return jsonify({'message': 'Score Added'})
+                
         except:
             db.session.rollback()
             return jsonify({"message": "Error Adding Score !"})
@@ -346,5 +386,6 @@ api.add_resource(ChapterListAPI, "/chapters/<int:subject_id>")
 api.add_resource(QuizAPI, "/quiz/<int:quiz_id>")
 api.add_resource(QuizListAPI, "/quizes/<int:chapter_id>")
 
-api.add_resource(AddQuestionAPI,"/question/<int:quiz_id>")
+api.add_resource(QuestionAPI, "/question/<int:question_id>")
+api.add_resource(AddQuestionAPI, "add/question/<int:quiz_id>")
 api.add_resource(SubmitQuizAPI,"/SubmitQuiz/<int:quiz_id>")

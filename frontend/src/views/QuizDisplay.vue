@@ -7,7 +7,7 @@
         <h4>Total Marks: {{ TotalMarks }}</h4>
         <hr>
         <div v-for="question in quiz.questions" :key="question.id">
-                <h5>Q{{ question.id }}. {{ question.statement }} ({{ question.marks }} Mark)</h5>
+                <h5>Q{{ question.id }}. {{ question.statement }} ({{ question.marks }} Mark)</h5> 
             
             <ol v-if="$store.state.roles =='admin'">
                 <li v-for="(option, index) in question.options" :key="index" :class="{ 'correct-answer':option === question.correct_answer,
@@ -16,17 +16,11 @@
                     {{ option }}
                 </li>
             </ol>
-            <ol v-if="$store.state.roles =='user' ">
-                <li v-for="(option, index) in question.options" :key="index" :class="{ 'correct-answer':option === question.correct_answer,
-                           'incorrect-answer':option !== question.correct_answer
-                 }">
-                    {{ option }}
-                </li>
-            </ol>
+          <button @click="$router.push({name:'EditQuestion',params:{quiz_id: quiz.id, question_id: question.id}})"
+            v-if="$store.state.roles == 'admin'">Edit Question ✏️</button>
         </div>
         <button @click="$router.push({name:'AddQuestion',params:{quiz_id: quiz.id}})"
             v-if="$store.state.roles == 'admin'">Add Questions</button>
-        <button @click="submitQuiz" v-if="$store.state.roles == 'user'">Submit Quiz</button>
 
 
     </div>

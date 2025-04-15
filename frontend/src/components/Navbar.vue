@@ -6,7 +6,7 @@
             <!-- Admin Based Links -->
             <router-link to='/' class="router-link-padding"> Home </router-link>
             <router-link to='/dashboard' class="router-link-padding"> Dash </router-link>
-            <router-link to='/api/subjects' class="router-link-padding"> View Subjects </router-link>
+            <router-link to='/subjects' class="router-link-padding"> View Subjects </router-link>
             <router-link to='/add-subjects' class="router-link-padding"> Add Subject </router-link>
             <router-link to='/about' class="router-link-padding"> About </router-link>
             <router-link to='/AllSubjects' class="router-link-padding"> All Subjects </router-link>
