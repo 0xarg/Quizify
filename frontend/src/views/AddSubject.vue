@@ -20,12 +20,9 @@ export default {
         async AddSubject() {
             const res = await fetch('http://localhost:5000/' + '/api/subjects', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: this.name, description: this.description })
+                headers: { 'Content-Type': 'application/json', 'Authentication-Token': JSON.parse(localStorage.getItem('user')).token }, body: JSON.stringify({ name: this.name, description: this.description })
             })
             if (res.ok) {
-                console.log('Valid Subject')
-                const data = await res.json()
-                console.log(data)
                 this.$router.push('/subjects')
 
 

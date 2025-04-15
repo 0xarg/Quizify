@@ -3,9 +3,9 @@ from flask import jsonify, request, current_app as app
 from flask_restful import Api, Resource, fields, marshal_with
 from models import *
 from flask_security import auth_required, current_user 
-
-
 from datetime import time, datetime
+
+cache = app.cache
 
 
 class TimeField(fields.Raw):
@@ -62,6 +62,7 @@ quiz_fields = {
 
 class SubjectAPI(Resource):
     @auth_required('token')
+    @cache.memoize()
     @marshal_with(subject_fields)
     def get(self, subject_id):
         subject = Subject.query.get(subject_id)
@@ -107,6 +108,7 @@ class SubjectAPI(Resource):
 
 class SubjectListAPI(Resource):
     @auth_required('token')
+    @cache.cached(timeout=5,key_prefix='subject_list')
     @marshal_with(subject_fields)
     def get(self):
         subjects = Subject.query.all()
@@ -132,6 +134,7 @@ class SubjectListAPI(Resource):
 
 class ChapterAPI(Resource):
     @auth_required('token')
+    @cache.memoize()
     @marshal_with(chapter_fields)
     def get(self, chapter_id):
         chapter = Chapter.query.get(chapter_id)
@@ -159,7 +162,7 @@ class ChapterAPI(Resource):
     def put(self, chapter_id):
         data = request.get_json()
         name = data.get("name")
-        description = data.get("desription")
+        description = data.get("description")
 
         chapter = Chapter.query.get(chapter_id)
         if not chapter:
@@ -177,6 +180,7 @@ class ChapterAPI(Resource):
 
 class ChapterListAPI(Resource):
     @auth_required('token')
+    @cache.cached(timeout=5, key_prefix='chapters_list')
     @marshal_with(chapter_fields)
     def get(self, subject_id):
         chapters = Chapter.query.filter_by(subject_id=subject_id).all()
@@ -202,6 +206,7 @@ class ChapterListAPI(Resource):
 
 class QuizAPI(Resource):
     @auth_required('token')
+    @cache.memoize()
     @marshal_with(quiz_fields)
     def get(self, quiz_id):
         quiz = Quiz.query.get(quiz_id)
@@ -254,13 +259,13 @@ class QuizAPI(Resource):
 
 class QuizListAPI(Resource):
     @auth_required('token')
+    @cache.cached(timeout=5, key_prefix='Quiz_list')
     @marshal_with(quiz_fields)
     def get(self, chapter_id):
-        
         quizes = Quiz.query.filter_by(chapter_id=chapter_id).all()
         return quizes
 
-    # @auth_required('token')
+    @auth_required('token')
     def post(self, chapter_id):
         print("ok")
         data = request.get_json()
@@ -291,12 +296,27 @@ class QuizListAPI(Resource):
 
 class QuestionAPI(Resource):
     @auth_required('token')
+    @cache.memoize()
     @marshal_with(question_fields)
     def get(self, question_id):
         question = Questions.query.get(question_id)
         if not question:
             return {"message":"Question Not Found"}
         return question
+    
+    @auth_required('token')
+    def delete(self, question_id):
+        question = Questions.query.get(question_id)
+
+        if not question:
+            return jsonify({'message': 'Question not Found'}), 404
+        try:
+            db.session.delete(question)
+            db.session.commit()
+            return jsonify({'message': 'Question Deleted'})
+        except:
+            db.session.rollback()
+            return jsonify({'message': 'Error Deleting Question'}), 500
 
     @auth_required('token')
     def put(self, question_id):

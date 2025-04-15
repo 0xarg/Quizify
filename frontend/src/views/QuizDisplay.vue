@@ -7,8 +7,8 @@
         <h4>Total Marks: {{ TotalMarks }}</h4>
         <hr>
         <div v-for="question in quiz.questions" :key="question.id">
-                <h5>Q{{ question.id }}. {{ question.statement }} ({{ question.marks }} Mark)</h5> 
-            
+            <h5>Q{{ question.id }}. {{ question.statement }} ({{ question.marks }} Mark)</h5>
+
             <ol v-if="$store.state.roles =='admin'">
                 <li v-for="(option, index) in question.options" :key="index" :class="{ 'correct-answer':option === question.correct_answer,
                            'incorrect-answer':option !== question.correct_answer
@@ -16,9 +16,15 @@
                     {{ option }}
                 </li>
             </ol>
-          <button @click="$router.push({name:'EditQuestion',params:{quiz_id: quiz.id, question_id: question.id}})"
-            v-if="$store.state.roles == 'admin'">Edit Question ✏️</button>
+            <button @click="$router.push({name:'EditQuestion',params:{quiz_id: quiz.id, question_id: question.id}})"
+                v-if="$store.state.roles == 'admin'">Edit Question ✏️</button>
+                <br>
+                <br>
+            <button v-if="$store.state.roles == 'admin'" style="background-color: lightcoral;"
+                @click='DeleteQuestion(question.id)'>delete</button>
+
         </div>
+        <br>
         <button @click="$router.push({name:'AddQuestion',params:{quiz_id: quiz.id}})"
             v-if="$store.state.roles == 'admin'">Add Questions</button>
 
@@ -55,8 +61,25 @@
             calculateTotalMarks(){
                 this.TotalMarks = this.quiz.questions.reduce((sum,question)=> sum + question.marks,0)
             },
-            submitQuiz(){
-                
+            async DeleteQuestion(question_id) {
+
+                try {
+                    const res = await fetch('http://localhost:5000/' + 'api/question/' + question_id, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json', 'Authentication-Token': JSON.parse(localStorage.getItem('user')).token }
+                    })
+                    if (res.ok) {
+                        alert("Question Deleted")
+                        this.$router.push('/Quiz/' + this.cid).then(() => { window.location.reload() })
+                    } else {
+                        const errorData = await res.json();
+                        alert("Error: " + (errorData.message || "Invalid duration format!"));
+
+                    }
+                } catch (error) {
+                    alert("Error: Could not connect to the server.");
+                    console.log(error)
+                }
             }
         }
 

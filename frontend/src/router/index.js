@@ -19,6 +19,8 @@ import AddQuestion from '@/views/AddQuestion.vue';
 import QuizTake from '@/views/QuizTake.vue';
 import EditQuestion from '@/views/EditQuestion.vue';
 import EditQuiz from '@/views/EditQuiz.vue';
+import EditChapter from '@/views/EditChapter.vue';
+import EditSubject from '@/views/EditSubject.vue';
 
 const routes = [
   {
@@ -87,6 +89,12 @@ const routes = [
     props: true,
   },
   {
+    path: "/EditChapter/:chapter_id",
+    name: "EditChapter",
+    component: EditChapter,
+    props: true,
+  },
+  {
     path: "/Chapter/:chapter_id",
     name: "Chapter",
     component: ChapterDisplay,
@@ -94,6 +102,12 @@ const routes = [
       chapter_id: route.params.chapter_id,
       sid: route.query.subject_id,
     }),
+  },
+  {
+    path: "/EditSubject/:subject_id",
+    name: "EditSubject",
+    component: EditSubject,
+    props: true,
   },
   {
     path: "/AllSubjects/",
@@ -109,6 +123,7 @@ const routes = [
       sid: route.query.sid,
     }),
   },
+
   {
     path: "/EditQuiz/:quiz_id",
     name: "EditQuiz",

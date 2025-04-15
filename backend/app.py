@@ -1,6 +1,7 @@
 from flask import Flask
 from config import LocalDevelopmentConfig
 from models import db, User, Role
+from flask_caching import Cache
 from flask_security import Security, SQLAlchemyUserDatastore, auth_required
 from flask_cors import CORS
 
@@ -19,9 +20,11 @@ def createApp():
     #model initialization
     db.init_app(app)
     
-    # Restful Initialization
-    from resources import api
-    api.init_app(app)
+    # Cache Initialization
+    
+    cache = Cache(app)
+    app.cache = cache
+    
     
     # Flask Security
     
@@ -29,6 +32,10 @@ def createApp():
     app.security = Security(app, datastore=datastore, register_blueprint=False)
 
     app.app_context().push()
+    
+    # Restful Initialization
+    from resources import api
+    api.init_app(app)
     
     return app
 

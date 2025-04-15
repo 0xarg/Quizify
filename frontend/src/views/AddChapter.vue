@@ -21,7 +21,7 @@ export default {
         async AddChapter() {
             const res = await fetch('http://localhost:5000/' + '/api/chapters/'+this.id, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: this.name, description: this.description })
+                headers: { 'Content-Type': 'application/json', 'Authentication-Token': JSON.parse(localStorage.getItem('user')).token }, body: JSON.stringify({ name: this.name, description: this.description })
             })
             if (res.ok) {
                 console.log('Valid Chapter')

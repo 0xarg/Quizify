@@ -1,18 +1,16 @@
 <template>
     <div>
-        <!-- <h2 @click ="$router.push('/Subject/'+ subject_id)">{{ name }}</h2>
-        <p>Description: {{ description }}</p>
-        
-        <p>Id: {{ subject_id }}</p>
-        <hr> -->
-        
-        <!-- Button for Admin to Add Subject -->
-        
-        <!-- <h1>📚 All Subjects</h1> -->
+
         <div class="subject">
             <h2 @click="$router.push('/Subject/' + subject_id)" class="clickable">{{ name }}</h2>
             <p><strong>Description:</strong> {{ description }}</p>
             <p><strong>Subject ID:</strong> {{ subject_id }}</p>
+            <button v-if="$store.state.roles == 'admin'"
+                @click="$router.push({ name: 'EditSubject', params: { subject_id: this.subject_id } })">Edit
+                Subject</button>
+                <br>
+            <button style="background-color: lightcoral;" @click='DeleteSubject'>delete</button>
+
             <hr>
         </div>
     </div>
@@ -21,7 +19,26 @@
 <script>
     export default {
         name: 'SubjectCard',
-        props: ["name","description","subject_id"]
+        props: ["name","description","subject_id"],
+        methods: {
+            async DeleteSubject() {
+                const res = await fetch('http://localhost:5000/' + '/api/subjects/' + this.subject_id, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json', 'Authentication-Token': JSON.parse(localStorage.getItem('user')).token }, body: JSON.stringify({ name: this.name, description: this.description })
+                })
+                if (res.ok) {
+                    alert("Subject Deleted")
+                    this.$router.push( '/subjects').then(()=> {window.location.reload()})
+
+                    
+
+
+
+
+                }
+            }
+
+        },
     }
 </script>
 
