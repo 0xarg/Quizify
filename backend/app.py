@@ -4,6 +4,7 @@ from models import db, User, Role
 from flask_caching import Cache
 from flask_security import Security, SQLAlchemyUserDatastore, auth_required
 from flask_cors import CORS
+from celery_tasks.celery_factory import celery_init_app
 
 
 
@@ -40,6 +41,8 @@ def createApp():
     return app
 
 app = createApp()
+celery_app = celery_init_app(app)
+
 import initial_data
 import routes
 

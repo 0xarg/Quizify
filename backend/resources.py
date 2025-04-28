@@ -1,9 +1,11 @@
 import re
 from flask import jsonify, request, current_app as app
 from flask_restful import Api, Resource, fields, marshal_with
+from pytz import timezone
+from celery_tasks.tasks import send_reminders
 from models import *
 from flask_security import auth_required, current_user 
-from datetime import time, datetime
+from datetime import time, datetime, timedelta
 
 cache = app.cache
 
@@ -210,12 +212,23 @@ class QuizAPI(Resource):
     @marshal_with(quiz_fields)
     def get(self, quiz_id):
         quiz = Quiz.query.get(quiz_id)
-
         if not quiz:
             print("Quiz not Found")
             return jsonify({'message': 'Quiz not Found'}), 404
         
+        visit = QuizAttendance.query.filter_by(user_id=current_user.id, quiz_id = quiz.id).first()
+        if not visit:
+            nvisit = QuizAttendance(user_id = current_user.id, quiz_id = quiz.id)
+            try:
+                db.session.add(nvisit)
+                db.session.commit()
+            except:
+                db.session.rollback()
+                return jsonify({'message': 'Error Adding attendance'}), 500
         return quiz
+
+            
+        
 
     @auth_required('token')
     def delete(self, quiz_id):
@@ -267,7 +280,6 @@ class QuizListAPI(Resource):
 
     @auth_required('token')
     def post(self, chapter_id):
-        print("ok")
         data = request.get_json()
         remarks = data.get("remarks")
         duration = data.get("duration")
@@ -285,8 +297,15 @@ class QuizListAPI(Resource):
         try:
             db.session.add(quiz)
             db.session.commit()
-            print(duration)
-            print(remarks)
+            print(f"Quiz {quiz.id} successfully committed.")
+            # result = send_reminders.delay(quiz.id)
+            now = datetime.now(timezone('Asia/Kolkata'))
+            etime = now.replace(hour = 15, minute = 35 , second=0,microsecond=0)
+            if now > etime:
+                etime += timedelta(days=1)
+            print(etime)
+            result = send_reminders.apply_async(args=[quiz.id], eta = etime)
+            print(etime)
             return jsonify({'message': 'Quiz Added'})
         except:
             db.session.rollback()

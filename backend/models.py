@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from time import time
 from flask_security import UserMixin, RoleMixin
+from sqlalchemy.types import JSON
 
 #Initialize db Object
 db = SQLAlchemy()
@@ -10,6 +11,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String,unique = True, nullable = False)
     password = db.Column(db.String, nullable = False)
+    pref_chapters = db.Column(JSON)
     
     fs_uniquifier = db.Column(db.String, unique = True, nullable = False)
     active = db.Column(db.Boolean, default = True)
@@ -76,6 +78,14 @@ class Scores(db.Model):
     time = db.Column(db.DateTime, index = True, default = datetime.now())
     total_score = db.Column(db.Integer, nullable = True)
     attempts = db.Column(db.Integer, nullable = False)
+    
+class QuizAttendance(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable = False)
+    visit_time = db.Column(db.DateTime, index=True, default=datetime.now())
+    
+    __table_args__ = (db.UniqueConstraint('user_id','quiz_id',name='_user_quiz_uc'),)
     
     
     

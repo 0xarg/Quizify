@@ -6,6 +6,7 @@ class CeleryConfig():
     broker_url = 'redis://localhost:6379/0'
     result_backend = 'redis://localhost:6379/1'
     timezone = 'Asia/Kolkata'
+    # enable_utc = False
 
 
 def celery_init_app(app: Flask) -> Celery:
