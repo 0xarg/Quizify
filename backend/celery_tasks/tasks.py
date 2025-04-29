@@ -15,47 +15,47 @@ from models import *
     
 
 @shared_task(ignore_results = False, name = "quiz_reminder")
-def send_reminders(quiz_id):
-    quiz = Quiz.query.get(quiz_id)
-    # print(quiz)
-
-    if not quiz:
-        print(f"No quiz found with id {quiz_id}")
-        return
-
-    users = User.query.filter(~User.roles.any(Role.name == 'admin'), ~User.id.in_(db.session.query(QuizAttendance.user_id).filter(QuizAttendance.quiz_id == quiz_id))).all()
-    chapter_name = quiz.chapter.name if quiz.chapter else "Unknown Chapter."
-    total_ques = quiz.questions.count()
-    url = "https://chat.googleapis.com/v1/spaces/AAQAy0NuQ3A/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=10L9CFD_Q_m9x17UtOu20lMAyu9Xa7khDs4nMhmC_KU"
-    # try:
-    #     response = requests.post(
-    #         url,
-    #         headers={'Content-Type': 'application/json'},
-    #         json=message,
-    #         timeout=10   # Always set a timeout!
-    #     )
-    #     print(f"Status Code: {response.status_code}")
-    #     print(f"Response Text: {response.text}")
-
-
-    # except requests.exceptions.RequestException as e:
-    #     print(f"Error occurred: {e}")
-        
-    
-    subject = f"New Quiz Available"
-   
-    # text = "Radha Vallabh Shri Harivansh"
+def send_reminders():
+    users = User.query.filter(~User.roles.any(Role.name == 'admin')).all()
     for user in users:
-        content = f"""
-        For @{user.email.split('@')[0]}
-        *New Quiz Added!!*\n
-        *Chapter:* {chapter_name}\n
-        *Total Questions:* {total_ques}\n
-        *Remarks:* {quiz.remarks or "No Remarks."}\n
-        _Learners are requested to attempt this quiz in order to get prepared for the Final Exam._\n
-        All the Best!
-        """
-        response = requests.post(
-            "https://chat.googleapis.com/v1/spaces/AAQAy0NuQ3A/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=10L9CFD_Q_m9x17UtOu20lMAyu9Xa7khDs4nMhmC_KU", headers={'Content-type': 'application/json'}, json={"text": content})
-        # send_email(to=user.email, subject=subject, content=content)
-    print(f"Reminder sent to {len(users)} users for the new Quiz.")
+        if not user.pref_subjects:
+            continue
+        
+        msg = []
+        for subj in user.pref_subjects:
+            subject = Subject.query.filter_by(name = subj).first()
+            if not subject:
+                continue
+                
+                
+            for chapter in subject.chapters:
+                for quiz in chapter.quizes:
+                    attendance = QuizAttendance.query.filter_by(user_id = user.id, quiz_id = quiz.id).first()
+                    if attendance is None:
+                        total_ques = quiz.questions.count()
+                        chapter_name = chapter.name
+                        subject_name = chapter.subject.name
+                        remarks = quiz.remarks or "No Remarks."
+                        msg.append(
+                            f"🔹 *Subject:* {subject_name} |  *Chapter:* {chapter_name} | *Questions:* {total_ques} | *Remarks:* {remarks}")
+                       
+                            
+        if msg:
+            content = (
+            f"Hi @{user.email.split('@')[0]} 👋\n\n"
+            
+            f"*New Quizzes Alert for you📝*\n"
+            f"{chr(10).join(msg)}\n\n"
+            
+            f"_You are requested to attempt these quizzes in preparation for the Final Exam._\n"
+                f"All the Best!🧠 "
+            )
+        
+            try:
+                response = requests.post(
+                    "https://chat.googleapis.com/v1/spaces/AAQAy0NuQ3A/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=10L9CFD_Q_m9x17UtOu20lMAyu9Xa7khDs4nMhmC_KU", headers={'Content-type': 'application/json'}, json={"text": content})
+                if response.status_code != 200:
+                    print(f"Failed to send reminder for quiz {quiz.id} and user{user.email} {response.json()}")
+            except Exception as e:
+                print(f"Error Sending Reminder to {user.email}: {e}")
+

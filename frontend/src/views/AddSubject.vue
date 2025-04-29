@@ -32,9 +32,6 @@ export default {
         }
 
     },
-    mounted() {
-        console.log('Add Subject component mounted');
-    },
 }
 </script>
 

@@ -4,8 +4,11 @@ from flask_restful import Api, Resource, fields, marshal_with
 from pytz import timezone
 from celery_tasks.tasks import send_reminders
 from models import *
-from flask_security import auth_required, current_user 
+from flask_security import auth_required, current_user, hash_password
 from datetime import time, datetime, timedelta
+
+datastore = app.security.datastore
+
 
 cache = app.cache
 
@@ -19,6 +22,14 @@ class TimeField(fields.Raw):
 
 
 api = Api(prefix="/api")
+
+user_fields = {
+    "id": fields.Integer,
+    "email": fields.String,
+    "pref_subjects": fields.Raw,
+    "roles": fields.List(fields.String, attribute=lambda user: [role.name for role in user.roles]),
+    
+}
 
 chapter_fields = {
     "id": fields.Integer,
@@ -60,8 +71,84 @@ quiz_fields = {
 
 
 }
+class UserAPI(Resource):
+    @auth_required('token')
+    @marshal_with(user_fields)
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"message": "User not found"},404
+        return user
+    
+    @auth_required('token')
+    def put(self, user_id):
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get("password")
+        pref_subjects = data.get("pref_subjects")
+        
+        user = User.query.get(user_id)
+        if not user:
+            return {"message":"User not found"}, 404
+        user.email = email if email else user.email
+        if password:
+            user.password = hash_password(password)
+        if pref_subjects:
+            user.pref_subjects = pref_subjects
+        
+        try:
+            db.session.commit()
+            return {"message":"User Updated Successfully"}
+        except:
+            db.session.rollback()
+            return {"message":"User Updation was Unsuccessfull, Please Try again with valid details"},500
+    
+    @auth_required('token')    
+    def delete(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"message": "User not found"}, 404
+        
+        try:
+            db.session.delete(user)
+            db.session.commit()
+            return {"message": "User Deleted Successfully."}
+        except:
+            db.session.rollback()
+            return {"message": "Error Deleting User!"}, 500
 
 
+class UserListAPI(Resource):
+    @auth_required('token')
+    @cache.cached(timeout=5, key_prefix='users_list')
+    @marshal_with(user_fields)
+    def get(self):
+        users = User.query.all()
+        return users
+
+    def post(self):
+        data = request.get_json()
+        email = data.get("email")
+        password = data.get("password")
+        pref_subjects = data.get("pref_subjects",[])
+        roles = ["user"]
+        print(pref_subjects)
+        
+        if User.query.filter_by(email = email).first():
+            return {"message":"User with this Email Already Exists!"},404
+        
+        try:
+            role_obj = Role.query.filter(Role.name.in_(roles)).all()
+            datastore.create_user(email = email, password = hash_password(password), pref_subjects = pref_subjects, roles = role_obj, active = True)
+            db.session.commit()
+            return {"message":"User added Successfully"}
+        except Exception as e:
+            db.session.rollback()
+            print("Error while adding is:",str(e))
+            return {"message": "Error Adding User!"}, 404
+
+
+        
 class SubjectAPI(Resource):
     @auth_required('token')
     @cache.memoize()
@@ -109,12 +196,11 @@ class SubjectAPI(Resource):
 
 
 class SubjectListAPI(Resource):
-    @auth_required('token')
+    # @auth_required('token')
     @cache.cached(timeout=5,key_prefix='subject_list')
     @marshal_with(subject_fields)
     def get(self):
         subjects = Subject.query.all()
-        print(subjects)
         return subjects
 
     def post(self):
@@ -299,13 +385,13 @@ class QuizListAPI(Resource):
             db.session.commit()
             print(f"Quiz {quiz.id} successfully committed.")
             # result = send_reminders.delay(quiz.id)
-            now = datetime.now(timezone('Asia/Kolkata'))
-            etime = now.replace(hour = 15, minute = 35 , second=0,microsecond=0)
-            if now > etime:
-                etime += timedelta(days=1)
-            print(etime)
-            result = send_reminders.apply_async(args=[quiz.id], eta = etime)
-            print(etime)
+            # now = datetime.now(timezone('Asia/Kolkata'))
+            # etime = now.replace(hour = 15, minute = 35 , second=0,microsecond=0)
+            # if now > etime:
+            #     etime += timedelta(days=1)
+            # print(etime)
+            # result = send_reminders.apply_async(args=[quiz.id], eta = etime)
+            # print(etime)
             return jsonify({'message': 'Quiz Added'})
         except:
             db.session.rollback()
@@ -413,6 +499,9 @@ class SubmitQuizAPI(Resource):
             return jsonify({"message": "Error Adding Score !"})
             
     
+
+api.add_resource(UserAPI,"/users/<int:user_id>")
+api.add_resource(UserListAPI,"/users")
     
 api.add_resource(SubjectAPI, "/subjects/<int:subject_id>")
 api.add_resource(SubjectListAPI, "/subjects")
@@ -426,5 +515,5 @@ api.add_resource(QuizAPI, "/quiz/<int:quiz_id>")
 api.add_resource(QuizListAPI, "/quizes/<int:chapter_id>")
 
 api.add_resource(QuestionAPI, "/question/<int:question_id>")
-api.add_resource(AddQuestionAPI, "add/question/<int:quiz_id>")
+api.add_resource(AddQuestionAPI, "/add/question/<int:quiz_id>")
 api.add_resource(SubmitQuizAPI,"/SubmitQuiz/<int:quiz_id>")

@@ -43,6 +43,8 @@ def createApp():
 app = createApp()
 celery_app = celery_init_app(app)
 
+import celery_tasks.celery_schedule
+
 import initial_data
 import routes
 

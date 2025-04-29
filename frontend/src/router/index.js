@@ -21,6 +21,7 @@ import EditQuestion from '@/views/EditQuestion.vue';
 import EditQuiz from '@/views/EditQuiz.vue';
 import EditChapter from '@/views/EditChapter.vue';
 import EditSubject from '@/views/EditSubject.vue';
+import RegisterUser from '@/views/RegisterUser.vue';
 
 const routes = [
   {
@@ -55,6 +56,12 @@ const routes = [
     name: "Login",
     component: Login,
   },
+  {
+    path: "/Register",
+    name: "registerUser",
+    component: RegisterUser
+  },
+
   {
     path: "/ping",
     name: "ping",

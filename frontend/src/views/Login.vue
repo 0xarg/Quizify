@@ -1,9 +1,12 @@
 <template>
     <div>
         <h3>Login Form</h3>
-        <input placeholder="email" v-model = "email"/>
-        <input placeholder="password" v-model = "password"/>
+        <input placeholder="email" v-model="email" />
+        <input placeholder="password" v-model="password" />
         <button @click='submitLogin'>Login</button>
+        <br>
+        <hr>
+        <button @click="$router.push({ name: 'registerUser'})">New User, Register</button>
     </div>
 </template>
 
