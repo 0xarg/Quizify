@@ -1,11 +1,13 @@
+import os
 import re
-from flask import jsonify, request, current_app as app
+from flask import jsonify, request, current_app as app, send_file
 from flask_restful import Api, Resource, fields, marshal_with
 from pytz import timezone
-from celery_tasks.tasks import send_reminders
+from celery_tasks.tasks import send_reminders, user_quizCsv
 from models import *
 from flask_security import auth_required, current_user, hash_password
 from datetime import time, datetime, timedelta
+from celery.result import AsyncResult
 
 datastore = app.security.datastore
 
@@ -500,6 +502,40 @@ class SubmitQuizAPI(Resource):
             
     
 
+
+
+class CreateCSV(Resource):
+    @auth_required('token')
+    def post(self):
+        task = user_quizCsv.delay(current_user.id)
+        return {'task_id':task.id}
+
+class GetCSV(Resource):
+    # @auth_required('token')
+    def get(self,id):
+        result = AsyncResult(id)
+        if result.ready():
+            relative_path = f'./backend/user_downloads/{result.result}'
+            file_path = os.path.abspath(relative_path)
+            print(f"Checking file path: {file_path}")
+            print(f"Checking relative path: {relative_path}")
+            return send_file(file_path, as_attachment=True)
+        else:
+            return {'message':'Report is not ready yet'},405
+        
+    @auth_required('token')
+    def post(self,id):
+        result = AsyncResult(id)
+        if result.ready():
+            relative_path = f'./backend/user_downloads/{result.result}'
+            file_path = os.path.abspath(relative_path)
+            print(f"Checking file path: {file_path}")
+            print(f"Checking relative path: {relative_path}")
+            return send_file(file_path, as_attachment=True)
+        else:
+            return {'message':'Report is not ready yet'},405
+
+
 api.add_resource(UserAPI,"/users/<int:user_id>")
 api.add_resource(UserListAPI,"/users")
     
@@ -517,3 +553,6 @@ api.add_resource(QuizListAPI, "/quizes/<int:chapter_id>")
 api.add_resource(QuestionAPI, "/question/<int:question_id>")
 api.add_resource(AddQuestionAPI, "/add/question/<int:quiz_id>")
 api.add_resource(SubmitQuizAPI,"/SubmitQuiz/<int:quiz_id>")
+
+api.add_resource(CreateCSV,"/createCSV")
+api.add_resource(GetCSV,"/getCSV/<string:id>")

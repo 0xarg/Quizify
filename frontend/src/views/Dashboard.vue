@@ -3,12 +3,24 @@
 
         <div v-if="$store.state.loggedIn && $store.state.roles == 'admin'">
             <h1>This is Admin DashBoard</h1>
+
+            <div class="dashboard-sections">
+                <!-- View Subjects -->
+                <div class="section">
+                    <h2>📚 View Subjects</h2>
+                    <p>Browse through available subjects.</p>
+                    <button @click="$router.push({ name: 'SubjectList' })">View Subjects</button>
+                </div>
+            </div>
         </div>
 
         <!-- User Dash  -->
         <div v-if="$store.state.loggedIn && $store.state.roles == 'user'">
-            <h1>Welcome to  Dashoard</h1>
-
+            <h1>Welcome to Dashoard</h1>
+            <hr>
+            <br>
+            <button @click="create_csv" class='btn btn-warning'> Get Quiz Data </button>
+            <hr>
             <div class="dashboard-sections">
                 <!-- View Subjects -->
                 <div class="section">
@@ -37,7 +49,37 @@
 
 <script>
 export default {
-    name: 'Admin-Dash'
+    name: 'Admin-Dash',
+    methods: {
+        async create_csv() {
+            console.log("Button clicked, create_csv method triggered");
+
+            try{
+                const res = await fetch('http://localhost:5000/'+ 'api/createCSV', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authentication-Token': JSON.parse(localStorage.getItem('user')).token}
+                })
+                const task_id = (await res.json()).task_id;
+                const interval = setInterval(async () => {
+                    const res = await fetch(`http://localhost:5000/api/getCSV/${task_id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authentication-Token': JSON.parse(localStorage.getItem('user')).token }
+                    })
+                    if (res.ok) {
+                        console.log("Data is Ready");
+                        window.open(`http://localhost:5000/api/getCSV/${task_id}`)
+                        clearInterval(interval)
+                    }
+                },1000)
+            }
+            catch(error) {
+                console.error("Error getting csv:", error)
+                alert("Failed to Get CSV")
+            }
+        }
+    }
 }
 </script>
 

@@ -1,5 +1,5 @@
 from celery.schedules import crontab
-from celery_tasks.tasks import send_reminders
+from celery_tasks.tasks import send_reminders, monthly_report
 from flask import current_app as app
 celery_app = app.extensions["celery"]
 
@@ -9,6 +9,11 @@ def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
         crontab(hour=12, minute=3),
         send_reminders.s(),
+        name="Daily Quiz Reminder"
+    )
+    sender.add_periodic_task(
+        crontab(hour=14, minute=40),
+        monthly_report.s(),
         name="Daily Quiz Reminder"
     )
     # sender.add_periodic_task(
