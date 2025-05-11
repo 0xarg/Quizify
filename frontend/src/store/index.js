@@ -27,10 +27,10 @@ const store = createStore({
     },
         
     logout(state){
-      auth_token:null;
-      roles: [];
-      loggedIn: false;
-      user_id: null;
+      state.auth_token=null;
+      state.roles = [];
+      state.loggedIn = false;
+      state.user_id = null;
 
       localStorage.removeItem("user")
 

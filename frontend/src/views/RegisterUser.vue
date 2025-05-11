@@ -50,7 +50,7 @@
                     })
                     console.log(this.selectedSubjs)
                     alert("User Registered Successfully")
-                    this.$router.push('/login')
+                    this.$router.push('/')
 
                 } catch(error) {
                     console.error("Error adding User:",error)

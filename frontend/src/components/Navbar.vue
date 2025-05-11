@@ -2,7 +2,7 @@
     <div>
 
 
-        <div v-if="$store.state.loggedIn && $store.state.roles == 'admin'">
+        <div v-if="isLoggedIn && isAdmin">
             <!-- Admin Based Links -->
             <router-link to='/' class="router-link-padding"> Home </router-link>
             <router-link to='/dashboard' class="router-link-padding"> Dash </router-link>
@@ -10,13 +10,13 @@
             <router-link to='/add-subjects' class="router-link-padding"> Add Subject </router-link>
             <router-link to='/about' class="router-link-padding"> About </router-link>
             <router-link to='/AllSubjects' class="router-link-padding"> All Subjects </router-link>
-            <button v-if="$store.state.loggedIn" @click="$store.commit('logout')"> Logout </button>
-            <router-link v-if="!$store.state.loggedIn" to='/login'> login </router-link>
+            <button v-if="$store.state.loggedIn" @click="logout"> Logout </button>
+            <router-link v-if="!$store.state.loggedIn" to='/'> login </router-link>
         </div>
 
 
         <!-- User Based Links -->
-        <div v-if="$store.state.loggedIn && $store.state.roles == 'user'">
+        <div v-if="isLoggedIn && isUser">
             
             <router-link to='/dashboard' class="router-link-padding"> Dash </router-link>
 
@@ -34,7 +34,27 @@
 <script>
 
 export default {
-    name: 'Navbar'
+    name: 'Navbar',
+    computed: {
+        isLoggedIn() {
+            console.log('isLoggedIn:', this.$store.state.loggedIn);
+            return this.$store.state.loggedIn;
+        },
+        isAdmin() {
+            console.log('isAdmin:', this.$store.state.roles == 'admin');
+            return this.$store.state.roles == 'admin';
+        },
+        isUser() {
+            console.log('user:', this.$store.state.roles == 'user');
+            return this.$store.state.roles == 'user';
+        }
+    },
+    methods: {
+        logout(){
+            this.$store.commit('logout');
+            this.$router.push('/')
+        }
+    }
 }
 
 

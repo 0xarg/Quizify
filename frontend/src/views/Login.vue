@@ -1,16 +1,63 @@
 <template>
-    <div>
-        <h3>Login Form</h3>
-        <input placeholder="email" v-model="email" />
-        <input placeholder="password" v-model="password" />
-        <button @click='submitLogin'>Login</button>
-        <br>
-        <hr>
-        <button @click="$router.push({ name: 'registerUser'})">New User, Register</button>
-    </div>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quizify</title>
+        <link rel="stylesheet" href="/static/style.css">
+
+    </head>
+
+    <body class="body-start-sponsor">
+        <header>
+            <h2 class="logo">Quizify</h2>
+            <nav class="navigation">
+                <a href="">Home</a>
+                <a href="">About</a>
+                <a href="">Services</a>
+                <a href="">Contact</a>
+
+            </nav>
+        </header>
+        <div class="wrapper">
+
+            <div class="form-box Login">
+                <h2>Login</h2>
+                <!-- <button></button> -->
+                <div class="input-box">
+                    <span class="start-icon">
+                        <ion-icon name="mail"></ion-icon>
+                    </span>
+                    <input type="email" required name="username" v-model="email">
+                    <label for="Username">Email</label>
+
+                </div>
+                <div class="input-box">
+                    <span class="start-icon"><ion-icon name="lock-closed"></ion-icon></span>
+                    <input type="password" required name="password" v-model="password">
+                    <label>Password</label>
+                </div>
+                <div class="remember-forget">
+                    <label for=""><input type="checkbox">Remember me</label>
+                    <a href="">Forget Password?</a>
+                </div>
+                <button @click='submitLogin' class="btn">Login</button>
+                <div class="login-register">
+                    <p>Don't have an account ? <a @click="$router.push({ name: 'registerUser' })">Register now</a></p>
+                </div>
+
+            </div>
+        </div>
+
+    </body>
+
+    </html>
 </template>
 
 <script>
+
     export default {
         name:'Login',
         data() {
@@ -21,28 +68,30 @@
         },
         methods: {
             async submitLogin(){
-                const res = await fetch('http://localhost:5000/' + '/login', {
-                    method: 'POST',
-                    headers:{'Content-Type':'application/json'}, body:JSON.stringify({email:this.email, password: this.password})})
-                    if (res.ok){
-                console.log('We are Logged in')
-                const data = await res.json()
-                console.log(data)
-
-                // Storing the token to authorize with each request
-                localStorage.setItem('user',JSON.stringify(data))
-                this.$store.commit('setUser')
-                this.$router.push('/')
+                try{
                     
-                    
-                    
-            }
+                    const res = await fetch('http://localhost:5000' + '/login', {
+                        method: 'POST',
+                        headers:{'Content-Type':'application/json'}, body:JSON.stringify({email:this.email, password: this.password})})
+                        if (res.ok){
+                        const data = await res.json()
+                        // Storing the token to authorize with each request
+                        localStorage.setItem('user',JSON.stringify(data))
+                        this.$store.commit('setUser')
+                        this.$router.push('/dashboard')
+                    } else {
+                        alert("Please Enter valid Email/Password !!")
+                        window.location.reload();
+                    }
+                }
+                catch(err){
+                    alert("Error: Could not connect to the Server.");
+                    console.error(err)
+                }
         }
         
     },
-    mounted() {
-  console.log('Login component mounted');
-},
+
 }
 </script>
 

@@ -25,12 +25,15 @@ import RegisterUser from '@/views/RegisterUser.vue';
 
 const routes = [
   {
+    path: "/login",
+    name: "Login",
+    component: Login,
+  },
+  {
     path: "/",
-    name: "home",
-    component: Home,
-    meta: {
-      requiresLogin: true,
-    },
+    name: "Login",
+    component: Login,
+
   },
   {
     path: "/about",
@@ -50,11 +53,6 @@ const routes = [
       requiresLogin: true,
       role: ["admin", "user"],
     },
-  },
-  {
-    path: "/login",
-    name: "Login",
-    component: Login,
   },
   {
     path: "/Register",
