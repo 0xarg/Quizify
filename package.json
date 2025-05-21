@@ -1,5 +1,9 @@
 {
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-regular-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "html-duration-picker": "^2.4.0",
     "vue3-timepicker": "^1.0.0-beta.2"
   }

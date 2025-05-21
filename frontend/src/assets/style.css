@@ -882,8 +882,8 @@ tdoot td {
     border-radius: 20px;
     border: 2px solid black;
     padding: 1.2rem;
-    width: 290px;
-    height: 250px;
+    width: 300px;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

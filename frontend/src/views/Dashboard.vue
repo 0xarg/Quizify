@@ -1,55 +1,268 @@
 <template>
-    <div>
+    <div class="dash-body">
 
-        <div v-if="$store.state.loggedIn && $store.state.roles == 'admin'">
-            <h1>This is Admin DashBoard</h1>
+        <div class="sidebar">
+            <div class="dash-logo"></div>
+            <ul class="menu">
+                <li class="active">
+                    <a href="/home">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/user_profile/{{ influencer_id }}">
+                        <i class="fas fa-user"></i>
+                        <span>Proifle</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Statistics</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/camp_select">
+                        <i class="fa-solid fa-snowflake"></i>
+                        <span>Search Campaign</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+                <li class="logout">
+                    <a href="/">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Log Out</span>
+                    </a>
+                </li>
 
-            <div class="dashboard-sections">
-                <!-- View Subjects -->
-                <div class="section">
-                    <h2>📚 View Subjects</h2>
-                    <p>Browse through available subjects.</p>
-                    <button @click="$router.push({ name: 'SubjectList' })">View Subjects</button>
-                </div>
-            </div>
+            </ul>
+
         </div>
 
-        <!-- User Dash  -->
-        <div v-if="$store.state.loggedIn && $store.state.roles == 'user'">
-            <h1>Welcome to Dashoard</h1>
-            <hr>
-            <br>
-            <button @click="create_csv" class='btn btn-warning'> Get Quiz Data </button>
-            <hr>
-            <div class="dashboard-sections">
-                <!-- View Subjects -->
-                <div class="section">
-                    <h2>📚 View Subjects</h2>
-                    <p>Browse through available subjects.</p>
-                    <button @click="$router.push({ name: 'SubjectList' })">View Subjects</button>
+        <div class="main--content">
+            <div class="header--wrapper">
+                <div class="header--title">
+                    <span>Welcome </span> <span style="font-weight: bold; text-decoration:underline ">{{ uname }}</span>
+                    <br>
+                    <span style="font-weight: bold; color:red "> {{ msg }}</span>
+                    <h2>Dashboard</h2>
+                    <!-- <h3>Ratings</h3> -->
+                </div>
+                <div class="user--info">
+                    <div class="search--box">
+
+                        <i class="fa-solid fa-search">
+
+                        </i>
+                        <input type="text" class="sin" name="" id="" placeholder="Search">
+                    </div>
+                    <!-- <img src="/static/2.jpg" alt=""> -->
+
                 </div>
 
-                <!-- Take a Quiz -->
-                <div class="section">
-                    <h2>📝 Take a Quiz</h2>
-                    <p>Start a quiz and test your knowledge.</p>
-                    <button @click="$router.push({ name: 'TakeQuiz' })">Take a Quiz</button>
+            </div>
+
+            <div class="card--container">
+                <h3 class="main--title">
+                    Today's data
+                </h3>
+                <div class="card--wrapper">
+                    <div class="payment--card light-red">
+                        <div class="card--header">
+                            <div class="amount">
+                                <span class="title">
+                                    Total Subjects
+                                </span>
+                                <br>
+                                <span class="amount--value">
+                                    {{ subjects.length }}
+                                </span>
+
+                            </div>
+                            <i class="fas dash-icon fa-duotone fa-thin fa-book dark-green"></i>
+                        </div>
+
+                    </div>
+
+                    <div class="payment--card light-blue">
+                        <div class="card--header">
+                            <div class="amount">
+                                <span class="title">
+                                    Total Chapters
+                                </span>
+                                <br>
+                                <span class="amount--value">
+                                    {{subjects.reduce((sum, s) => sum + (s.chapters ? s.chapters.length : 0), 0)}}
+                                </span>
+
+                            </div>
+                            <i class="fas dash-icon fa-thin fa-bookmark"></i>
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="payment--card light-purple">
+                        <div class="card--header">
+                            <div class="amount">
+                                <span class="title">
+                                    Total Quizes
+                                </span>
+                                <br>
+                                <span class="amount--value">
+                                    {{subjects.reduce((sum, s) => sum + (s.chapters ? s.chapters.reduce((cSum, c) =>
+                                    cSum + (c.quizes ? c.quizes.length : 0), 0) : 0), 0)}}
+                                </span>
+
+                            </div>
+                            <i class="fas dash-icon fa-thin fa-building-columns dark-purple"></i>
+
+                        </div>
+
+                    </div>
+
+
+
+
+                    <!-- <div class="payment--card light-green">
+                        <div class="card--header">
+                            <div class="amount">
+                                <span class="title">
+                                    
+                                </span>
+                                <br>
+                                <span class="amount--value">
+                                </span>
+
+                            </div>
+                            <i class="fas fa-check dash-icon dark-blue"></i>
+                        </div>
+
+                    </div> -->
+
+                </div>
+            </div>
+            <div class="tabular--wrapper">
+                <h3 class="main--title"> Subjects</h3>
+                <div class="table--container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name </th>
+                                <th>Description</th>
+                                <th>Total Chapters</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="subject in subjects" :key="subject.id">
+                                <td>{{subject.name}}</td>
+                                <td>{{subject.description}}</td>
+                                <td> {{subject.chapters ? subject.chapters.length : 0}}</td>
+                                <td><button class="yellow-btn">View</button></td>
+
+
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+            <div class="tabular--wrapper">
+                <h3 class="main--title"> Chapters</h3>
+                <div class="table--container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name </th>
+                                <th>Subject</th>
+                                <th>Description</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="chapter in allChapters" :key="chapter.id">
+                                <td>{{ chapter.name }}</td>
+                                <td>{{chapter.subjectName}}</td>
+                                <td> {{chapter.description}} </td>
+                                <td><button class="yellow-btn">View</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                <!-- View Quiz History -->
-                <div class="section">
-                    <h2>📜 View Quiz History</h2>
-                    <p>Check your past quiz attempts.</p>
-                    <button @click="$router.push({ name: 'QuizHistory' })">View History</button>
+            </div>
+            <div class="tabular--wrapper">
+                <h3 class="main--title"> Quizes</h3>
+                <div class="table--container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Chapter</th>
+                                <th>Duration</th>
+                                <th>View Quiz</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="quiz in allQuizzes" :key="quiz.id">
+                                <td>Quiz {{quiz.id}}</td>
+                                <td>{{quiz.chapterName}}</td>
+                                <td> {{quiz.duration}}</td>
+                                <td><button class="green-btn">View</button></td>
+                            </tr>
+                        </tbody>
+
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+
+
+    <!-- <h1>Welcome to Dashoard</h1>
+        <hr>
+        <br>
+        <button @click="create_csv" class='btn btn-warning'> Get Quiz Data </button>
+        <hr>
+        <div class="dashboard-sections">
+            <div class="section">
+                <h2>📚 View Subjects</h2>
+                <p>Browse through available subjects.</p>
+                <button @click="$router.push({ name: 'SubjectList' })">View Subjects</button>
+            </div>
+
+            <div class="section">
+                <h2>📝 Take a Quiz</h2>
+                <p>Start a quiz and test your knowledge.</p>
+                <button @click="$router.push({ name: 'TakeQuiz' })">Take a Quiz</button>
+            </div>
+
+            <div class="section">
+                <h2>📜 View Quiz History</h2>
+                <p>Check your past quiz attempts.</p>
+                <button @click="$router.push({ name: 'QuizHistory' })">View History</button>
+            </div>
+        </div>
+    </div>
+    </div> -->
 </template>
 
 <script>
 export default {
     name: 'Admin-Dash',
+    data(){
+        return{
+            subjects: [],
+        }
+    },
     methods: {
         async create_csv() {
             console.log("Button clicked, create_csv method triggered");
@@ -78,36 +291,57 @@ export default {
                 console.error("Error getting csv:", error)
                 alert("Failed to Get CSV")
             }
+        },
+        async fetch_data(){
+            try{
+                const res = await fetch('http://localhost:5000'+'/api/subjects', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json', 'Authentication-Token': JSON.parse(localStorage.getItem('user')).token }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    this.subjects = data;
+                    console.log("ok")
+                }
+            }catch (err){
+                console.error("Failed to fetch Data",err)
+            }
         }
+    },
+    computed: {
+        allChapters() {
+            let chapters = [];
+            this.subjects.forEach(subject => {
+                (subject.chapters || []).forEach(chapter => {
+                    chapters.push({
+                        ...chapter,
+                        subjectName: subject.name
+                    });
+                });
+            });
+            return chapters;
+        },
+        allQuizzes() {
+            let quizzes = [];
+            this.subjects.forEach(subject=>{
+                (subject.chapters || []).forEach(chapter =>{
+                    (chapter.quizes || []).forEach(quiz=>{
+                        quizzes.push({
+                            ...quiz,
+                            chapterName: chapter.name
+                        });
+                    });
+                });
+            });
+            return quizzes
+        }
+    },
+    mounted() {
+        this.fetch_data();
     }
 }
 </script>
 
 <style  scoped>
-
-h1 {
-    background-color: antiquewhite;
-}
-
-.dashboard-sections {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.section {
-    border: 1px solid #ccc;
-    padding: 15px;
-    border-radius: 10px;
-}
-
-button {
-    background-color: blue;
-    color: white;
-    padding: 8px 15px;
-    border: none;
-    cursor: pointer;
-    margin-top: 10px;
-}
 
 </style>

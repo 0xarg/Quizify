@@ -33,19 +33,6 @@ user_fields = {
     
 }
 
-chapter_fields = {
-    "id": fields.Integer,
-    "name": fields.String,
-    "description": fields.String,
-    "subject_id": fields.Integer,
-    "subject.name": fields.String,
-}
-subject_fields = {
-    "id": fields.Integer,
-    "name": fields.String,
-    "description": fields.String,
-    "chapters": fields.List(fields.Nested(chapter_fields))
-}
 
 question_fields = {
     "id": fields.Integer,
@@ -72,6 +59,21 @@ quiz_fields = {
     "scores": fields.List(fields.Nested(score_fields)),
 
 
+}
+chapter_fields = {
+    "id": fields.Integer,
+    "name": fields.String,
+    "description": fields.String,
+    "subject_id": fields.Integer,
+    "subject.name": fields.String,
+    "quizes": fields.List(fields.Nested(quiz_fields)),  # Add this line
+
+}
+subject_fields = {
+    "id": fields.Integer,
+    "name": fields.String,
+    "description": fields.String,
+    "chapters": fields.List(fields.Nested(chapter_fields))
 }
 class UserAPI(Resource):
     @auth_required('token')
