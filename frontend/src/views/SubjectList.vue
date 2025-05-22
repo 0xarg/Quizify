@@ -69,12 +69,13 @@
                             <i class="fa-brands fa-canadian-maple-leaf"></i>
                         </div>
                         <div>
-                            <button type="submit" class="abtn" style="width: 100px"
-                                v-if="$store.state.roles == 'admin'">Change</button>
+                            <button class="abtn" style="width: 100px" data-bs-toggle="modal"
+                                data-bs-target="#changeModal" v-if="$store.state.roles == 'admin'"
+                                @click="changeInit(subject)">Change</button>
                         </div>
                         <div>
-                            <button type="submit" @click="deleteSub(subject.id)" class="abtn" id="delbtn" style="width: 100px; margin: 10px 0px"
-                                v-if="$store.state.roles == 'admin'">
+                            <button type="submit" @click="deleteSub(subject.id)" class="abtn" id="delbtn"
+                                style="width: 100px; margin: 10px 0px" v-if="$store.state.roles == 'admin'">
                                 Delete
                             </button>
                         </div>
@@ -131,6 +132,34 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="changeModal" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel1">Edit a Subject</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                            <div class="mb-2">
+                                <label class="col-form-label">Title</label>
+                                <input type="text" class="form-control" name="title" v-model="name">
+                            </div>
+                            <div class="mb-2">
+                                <label class="col-form-label">Description</label>
+                                <input type="text" class="form-control" name="description" v-model="description">
+                            </div>
+
+
+                            <button type="submit" class="btn btn-outline-dark" @click="editSubject(this.sub_id)">Save Changes</button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" hidden></button>
+
+                    </div>
+                    <div class="modal-footer"></div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -144,10 +173,26 @@ export default {
             return{
                 name: null,
                 description: null,
+                sub_id: null,
                 subjects:[]
             }
         },
     methods: {
+        async fetchSubjects() {
+            try {
+                const res = await fetch('http://localhost:5000/' + '/api/subjects', {
+                    headers: {
+                        'Authentication-Token': JSON.parse(localStorage.getItem('user')).token
+                    }
+                })
+                if (res.ok) {
+                    this.subjects = await res.json()
+                }
+            } catch (err) {
+                console.error(err);
+            }
+
+        },
         async AddSubject() {
             try{
                 const res = await fetch('http://localhost:5000/' + '/api/subjects', {
@@ -167,21 +212,6 @@ export default {
             }
         },
 
-        async fetchSubjects(){
-            try{
-                const res = await fetch('http://localhost:5000/' + '/api/subjects',{
-                    headers: {
-                        'Authentication-Token': JSON.parse(localStorage.getItem('user')).token
-                    }
-                })
-                if (res.ok){
-                    this.subjects = await res.json()
-                }
-            }catch (err){
-                console.error(err);
-            }
-    
-        },
         async deleteSub(subject_id) {
             try{
                 const res = await fetch('http://localhost:5000/' + '/api/subjects/' + subject_id, {
@@ -189,15 +219,48 @@ export default {
                     headers: { 'Content-Type': 'application/json', 'Authentication-Token': JSON.parse(localStorage.getItem('user')).token }, body: JSON.stringify({ name: this.name, description: this.description })
                 })
                 if (res.ok) {
-                    alert("Subject Deleted")
                     this.$router.push('/subjects').then(() => { window.location.reload() })
+
                 }
             }catch (err){
                 console.error(err)
             }
-        }
+        },
+        
+        async changeInit(subject){
+            this.name = subject.name;
+            this.description = subject.description;
+            this.sub_id = subject.id;
+        },
+        
+        async editSubject(subject_id){
+            try {
+                const res = await fetch('http://localhost:5000/' + 'api/subjects/' + subject_id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authentication-Token': JSON.parse(localStorage.getItem('user')).token }, body: JSON.stringify({ name: this.name, description: this.description })
+                })
+                console.log(this.description)
+                if (res.ok) {
+                    document.querySelector('#changeModal .btn-close').click();
+                    this.name = null;
+                    this.description = null;
+                    this.sub_id = null;
+
+                    await this.fetchSubjects();
+                } else {
+                    const errorData = await res.json();
+                    alert("Error: " + (errorData.message || "Invalid Input"));
+                    
+                }
+
+            } catch (error) {
+                alert("Error: Could not connect to the server.");
+                console.log(error)
+            }
+        },
+        
+        
     },
-    
     mounted() {
         this.fetchSubjects();
     }
