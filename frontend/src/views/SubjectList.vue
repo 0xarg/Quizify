@@ -80,7 +80,9 @@
                             </button>
                         </div>
                         <div>
-                            <button class="abtn" style="text-decoration: none; color: chocolate;">
+                            <button class="abtn" style="text-decoration: none; color: chocolate;"
+                                @click="$router.push({ name: 'ChapterList', params: { subject_id: subject.id }, query: { subject_name: subject.name , subject_length: subjects.length} })">
+                                
                                 View More
                             </button>
                         </div>
@@ -141,18 +143,19 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                            <div class="mb-2">
-                                <label class="col-form-label">Title</label>
-                                <input type="text" class="form-control" name="title" v-model="name">
-                            </div>
-                            <div class="mb-2">
-                                <label class="col-form-label">Description</label>
-                                <input type="text" class="form-control" name="description" v-model="description">
-                            </div>
+                        <div class="mb-2">
+                            <label class="col-form-label">Title</label>
+                            <input type="text" class="form-control" name="title" v-model="name">
+                        </div>
+                        <div class="mb-2">
+                            <label class="col-form-label">Description</label>
+                            <input type="text" class="form-control" name="description" v-model="description">
+                        </div>
 
 
-                            <button type="submit" class="btn btn-outline-dark" @click="editSubject(this.sub_id)">Save Changes</button>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" hidden></button>
+                        <button type="submit" class="btn btn-outline-dark" @click="editSubject(this.sub_id)">Save
+                            Changes</button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" hidden></button>
 
                     </div>
                     <div class="modal-footer"></div>
@@ -219,7 +222,7 @@ export default {
                     headers: { 'Content-Type': 'application/json', 'Authentication-Token': JSON.parse(localStorage.getItem('user')).token }, body: JSON.stringify({ name: this.name, description: this.description })
                 })
                 if (res.ok) {
-                    this.$router.push('/subjects').then(() => { window.location.reload() })
+                    await this.fetchSubjects()
 
                 }
             }catch (err){

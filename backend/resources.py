@@ -201,7 +201,7 @@ class SubjectAPI(Resource):
 
 class SubjectListAPI(Resource):
     # @auth_required('token')
-    @cache.cached(timeout=5,key_prefix='subject_list')
+    @cache.cached(timeout=1,key_prefix='subject_list')
     @marshal_with(subject_fields)
     def get(self):
         subjects = Subject.query.all()
@@ -230,7 +230,6 @@ class ChapterAPI(Resource):
     @marshal_with(chapter_fields)
     def get(self, chapter_id):
         chapter = Chapter.query.get(chapter_id)
-
         if not chapter:
             print("Chapter not Found")
             return jsonify({'message': 'Chapter not Found'}), 404
@@ -272,7 +271,7 @@ class ChapterAPI(Resource):
 
 class ChapterListAPI(Resource):
     @auth_required('token')
-    @cache.cached(timeout=5, key_prefix='chapters_list')
+    @cache.cached(timeout=1, key_prefix='chapters_list')
     @marshal_with(chapter_fields)
     def get(self, subject_id):
         chapters = Chapter.query.filter_by(subject_id=subject_id).all()
@@ -288,8 +287,6 @@ class ChapterListAPI(Resource):
         try:
             db.session.add(chapter)
             db.session.commit()
-            print(name)
-            print(description)
             return jsonify({'message': 'Chapter Added'})
         except:
             db.session.rollback()

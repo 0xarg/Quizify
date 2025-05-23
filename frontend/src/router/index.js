@@ -25,15 +25,9 @@ import RegisterUser from '@/views/RegisterUser.vue';
 
 const routes = [
   {
-    path: "/login",
-    name: "Login",
-    component: Login,
-  },
-  {
     path: "/",
     name: "Login",
     component: Login,
-
   },
   {
     path: "/about",
@@ -57,7 +51,7 @@ const routes = [
   {
     path: "/Register",
     name: "registerUser",
-    component: RegisterUser
+    component: RegisterUser,
   },
 
   {
@@ -82,10 +76,14 @@ const routes = [
     props: true,
   },
   {
-    path: "/Chapters/:id",
+    path: "/Chapters/:subject_id",
     name: "ChapterList",
     component: ChapterList,
-    props: true,
+    props: (route) => ({
+      sid: route.params.subject_id,
+      sname: route.query.subject_name,
+      slength: route.query.subject_length,
+    }),
   },
   {
     path: "/AddChapter/:id",
