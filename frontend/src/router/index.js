@@ -22,6 +22,7 @@ import EditQuiz from '@/views/EditQuiz.vue';
 import EditChapter from '@/views/EditChapter.vue';
 import EditSubject from '@/views/EditSubject.vue';
 import RegisterUser from '@/views/RegisterUser.vue';
+import AdminQuiz from '@/views/AdminQuiz.vue';
 
 const routes = [
   {
@@ -82,7 +83,7 @@ const routes = [
     props: (route) => ({
       sid: route.params.subject_id,
       sname: route.query.subject_name,
-      slength: route.query.subject_length,
+      tchapters: route.query.totalChapters,
     }),
   },
   {
@@ -145,16 +146,23 @@ const routes = [
     path: "/Quizes/:chapter_id",
     name: "QuizList",
     component: QuizList,
-    props: true,
+    props: (route) => ({
+      cid: route.params.chapter_id,
+      cname: route.query.chapter_name,
+      tquiz: route.query.totalQuiz,
+    }),
   },
 
   {
     path: "/Quiz/:quiz_id",
     name: "Quiz",
-    component: QuizDisplay,
+    component: AdminQuiz,
     props: (route) => ({
       quiz_id: route.params.quiz_id,
-      cid: route.query.cid,
+      remarks: route.query.remarks,
+      tques: route.query.totalQues,
+      cid: route.query.chapter_id,
+      cname: route.query.chapter_name,
     }),
   },
   {

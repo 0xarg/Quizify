@@ -359,7 +359,7 @@ class QuizAPI(Resource):
 
 class QuizListAPI(Resource):
     @auth_required('token')
-    @cache.cached(timeout=5, key_prefix='Quiz_list')
+    @cache.cached(timeout=1, key_prefix='Quiz_list')
     @marshal_with(quiz_fields)
     def get(self, chapter_id):
         quizes = Quiz.query.filter_by(chapter_id=chapter_id).all()

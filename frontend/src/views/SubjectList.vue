@@ -81,7 +81,7 @@
                         </div>
                         <div>
                             <button class="abtn" style="text-decoration: none; color: chocolate;"
-                                @click="$router.push({ name: 'ChapterList', params: { subject_id: subject.id }, query: { subject_name: subject.name , subject_length: subjects.length} })">
+                                @click="$router.push({ name: 'ChapterList', params: { subject_id: subject.id }, query: { subject_name: subject.name , totalChapters: subject.chapters.length} })">
                                 
                                 View More
                             </button>

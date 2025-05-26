@@ -45,8 +45,8 @@
         <div class="main--content">
             <div class="header--wrapper">
                 <div class="header--title">
-                    <span>Subject</span>
                     <h2>{{ sname }}</h2>
+                    <span>Total Chapters: {{ tchapters }}</span>
                 </div>
                 <div class="user--info">
                     <div class="search--box">
@@ -80,7 +80,8 @@
                             </button>
                         </div>
                         <div>
-                            <button class="abtn" style="text-decoration: none; color: chocolate;">
+                            <button class="abtn" style="text-decoration: none; color: chocolate;"
+                                @click="$router.push({ name: 'QuizList', params: { chapter_id: chapter.id }, query: { chapter_name: chapter.name, totalQuiz: chapter.quizes.length } })">
                                 View More
                             </button>
                         </div>
@@ -122,7 +123,7 @@
                         </div>
 
 
-                        <button type="submit" id="sbmt-btn" class="btn btn-outline-dark" @click="AddChapter(id)">Add
+                        <button type="submit" id="sbmt-btn" class="btn btn-outline-dark" @click="AddChapter()">Add
                             Chapter</button>
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" hidden></button>
 
@@ -169,7 +170,7 @@
     export default {
         name: 'ChapterList',
 
-    props: ["sid", "sname", "slength"],
+    props: ["sid", "sname", "tchapters"],
         data() {
             return{
                 chapters:[],
@@ -231,7 +232,7 @@
                         document.querySelector('#changeModal .btn-close').click();
                         this.name = null;
                         this.description = null;
-                        this.sub_id = null;
+                        this.chap_id = null;
                         await this.fetchChapters();
 
                     } else {
@@ -253,12 +254,12 @@
                     })
                     if (res.ok) {
                         await this.fetchChapters()
-
                     }
                 } catch (err) {
                     console.error(err)
                 }
             },
+            
 
         },
        mounted(){
