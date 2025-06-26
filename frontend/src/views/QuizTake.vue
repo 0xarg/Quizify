@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <!-- <div>
         <div v-if="!isSubmitted">
             <h1>📝 Take Quiz: {{ quiz_id }}</h1>
             <h3>⏳ Duration: {{ quiz.duration }} minutes</h3>
@@ -41,6 +41,50 @@
         </div>
 
         <button v-if="!isSubmitted" @click=" submitQuiz">🚀 Submit Quiz</button>
+    </div> -->
+    <div class="quiz-wrapper">
+        <div v-if="!isSubmitted">
+            <section class="quiz-info-card">
+                <h2>📖 Quiz: {{ quiz_id }}</h2>
+                <p>Duration: {{ quiz.duration }}</p>
+                <p>Total Marks: {{ TotalMarks }}</p>
+                <p>Duration: {{ quiz.duration }}</p>
+
+            </section>
+            <section  class=" quiz-info-card-buttons button-section">
+                <div class="timer">
+                    <h5>{{ fTime }}</h5>
+                </div>
+                <div class="button-section">
+                    <button class="test-sbmt" @click="submitQuiz">Sumbit</button>
+                </div>
+            </section>
+        </div>
+        <div v-if="isSubmitted">
+            <section class="quiz-info-card">
+                <h3>🎉 Quiz Completed!</h3>
+                <p>⭐ You scored {{ AcheivedMarks }} out of {{ TotalMarks }}</p>
+                <p>📋 Submission Status: {{ status }}</p>
+            </section>
+            <section class=" quiz-info-card-buttons button-section">
+                <button class="test-sbmt" @click="exitExam">Back to All Quizes</button>
+            </section>
+        </div>
+
+        <main class="quiz-body">
+
+            <section class="quiz-question" v-for="(question, qIndex) in quiz.questions" :key="question.id">
+                Q{{ question.id }}. {{ question.statement }} ({{ question.marks }} Mark)
+                <form class="options">
+                    <label v-for="(option, oIndex) in question.options" :key="oIndex"><input type="radio" name="q1"
+                            :name="'question-' + qIndex" :value="option" v-model="selectedOptions[qIndex]" />  {{ option
+                        }}</label>
+                </form>
+            </section>
+
+
+        </main>
+
     </div>
 </template>
 
@@ -117,6 +161,9 @@ export default {
         },
 
 
+        exitExam(){
+            this.$router.push(`/Quizes/${this.cid}`)
+        },
         async submitQuiz() {
             let scored = 0;
             clearTimeout(this.autoSub)
@@ -152,75 +199,9 @@ export default {
             }
 
         },
-        retakeQuiz(){
-            this.isSubmitted = false
-            this.AcheivedMarks = 0
-            this.selectedOptions= []
-            this.remainingTime = this.DuraToMs(this.quiz.duration)
-            this.fTime = this.FTime(this.remainingTime)
-
-            clearTimeout(this.autoSub)
-            this.autoSub = setTimeout(this.submitQuiz,this.remainingTime);
-            clearInterval(this.countdown)
-            this.countdown = setInterval(()=> {
-                this.remainingTime -= 1000;
-                if (this.remainingTime <=0) {
-                    this.fTime = "00:00";
-                    clearInterval(this.countdown)
-                } else {
-                    this.fTime = this.FTime(this.remainingTime)
-                }
-            },1000)
-
-        }
     }
 
 }
 </script>
 
-<style scoped>
-.question-card {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-bottom: 10px;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-}
-.correct-answer {
-    color: green;
-    font-weight: bold;
-}
-
-.incorrect-answer {
-    color: red;
-}
-li {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 5px;
-}
-
-li:hover {
-    background-color: #f0f0f0;
-}
-
-.selected-option {
-    background-color: lightblue;
-    font-weight: bold;
-}
-
-button {
-    background-color: green;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    cursor: pointer;
-    margin-top: 15px;
-}
-</style>
+<style scoped></style>

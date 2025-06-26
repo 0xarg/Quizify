@@ -82,9 +82,13 @@
                             </button>
                         </div>
                         <div>
-                            <button class="abtn" style="text-decoration: none; color: chocolate;"
+                            <button v-if="$store.state.roles == 'admin'"  class="abtn" style="text-decoration: none; color: chocolate;"
                                 @click="$router.push({ name: 'Quiz', params: { quiz_id: quiz.id }, query: { remarks: quiz.remarks, totalQues: quiz.questions.length, chapter_id: cid, chapter_name: cname} })">
                                 View More
+                            </button>
+                            <button  v-if="$store.state.roles == 'user'" class="abtn" style="text-decoration: none; color: chocolate;"
+                                @click="$router.push({ name: 'QuizTake', params: { quiz_id: quiz.id }, query: { chapter_id: cid} })">
+                                Take Quiz
                             </button>
                         </div>
                     </div>

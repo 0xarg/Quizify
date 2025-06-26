@@ -2,7 +2,7 @@
 
 <template>
   
-  <Navbar />
+  <!-- <Navbar /> -->
   <router-view/>
 </template>
 

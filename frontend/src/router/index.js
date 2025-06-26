@@ -171,7 +171,7 @@ const routes = [
     component: QuizTake,
     props: (route) => ({
       quiz_id: route.params.quiz_id,
-      cid: route.query.cid,
+      cid: route.query.chapter_id,
     }),
   },
   {
