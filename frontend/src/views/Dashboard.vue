@@ -5,13 +5,13 @@
             <div class="dash-logo"></div>
             <ul class="menu">
                 <li class="active">
-                    <a href="/home">
+                    <a href="#">
                         <i class="fas fa-tachometer-alt"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li>
-                    <a href="/user_profile/{{ influencer_id }}">
+                    <a href="#">
                         <i class="fas fa-user"></i>
                         <span>Proifle</span>
                     </a>
@@ -22,12 +22,12 @@
                         <span>Subjects</span>
                     </a>
                 </li>
-                <li>
+                <!-- <li>
                     <a href="/camp_select">
                         <i class="fa-solid fa-snowflake"></i>
                         <span>Search Campaign</span>
                     </a>
-                </li>
+                </li> -->
                 <li>
                     <a href="#">
                         <i class="fas fa-cog"></i>
@@ -60,7 +60,7 @@
                         <i class="fa-solid fa-search">
 
                         </i>
-                        <input type="text" class="sin" name="" id="" placeholder="Search">
+                        <input type="text" class="sin" name="" id="" placeholder="Search Subject">
                     </div>
                     <!-- <img src="/static/2.jpg" alt=""> -->
 
@@ -131,11 +131,11 @@
 
 
 
-                    <!-- <div class="payment--card light-green">
+                    <div  v-if="$store.state.roles == 'user'" class="payment--card light-green">
                         <div class="card--header">
                             <div class="amount">
                                 <span class="title">
-                                    
+                                    <a @click="create_csv" style="cursor: pointer;">Create CSV</a>
                                 </span>
                                 <br>
                                 <span class="amount--value">
@@ -145,7 +145,7 @@
                             <i class="fas fa-check dash-icon dark-blue"></i>
                         </div>
 
-                    </div> -->
+                    </div>
 
                 </div>
             </div>
@@ -227,33 +227,6 @@
         </div>
     </div>
 
-
-    <!-- <h1>Welcome to Dashoard</h1>
-        <hr>
-        <br>
-        <button @click="create_csv" class='btn btn-warning'> Get Quiz Data </button>
-        <hr>
-        <div class="dashboard-sections">
-            <div class="section">
-                <h2>📚 View Subjects</h2>
-                <p>Browse through available subjects.</p>
-                <button @click="$router.push({ name: 'SubjectList' })">View Subjects</button>
-            </div>
-
-            <div class="section">
-                <h2>📝 Take a Quiz</h2>
-                <p>Start a quiz and test your knowledge.</p>
-                <button @click="$router.push({ name: 'TakeQuiz' })">Take a Quiz</button>
-            </div>
-
-            <div class="section">
-                <h2>📜 View Quiz History</h2>
-                <p>Check your past quiz attempts.</p>
-                <button @click="$router.push({ name: 'QuizHistory' })">View History</button>
-            </div>
-        </div>
-    </div>
-    </div> -->
 </template>
 
 <script>
@@ -284,6 +257,9 @@ export default {
                     if (res.ok) {
                         console.log("Data is Ready");
                         window.open(`http://localhost:5000/api/getCSV/${task_id}`)
+                        clearInterval(interval)
+                    }else{
+                        alert("Error connecting Backend");
                         clearInterval(interval)
                     }
                 },1000)

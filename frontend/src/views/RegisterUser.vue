@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <!-- <div>
         <h3>Register</h3>
         <label for="email">Email</label>
         <input name="email" placeholder="Email" v-model = "email">
@@ -13,6 +13,69 @@
         </select>
         <br>
         <button @click="registerUser"> Register</button>
+    </div> -->
+    <div>
+        <div class="body-start">
+            <!--------------------------------Navbar----Start------------------------------------------------------------------------------------------------>
+            <header>
+                <h2 class="logo">InfluenSync</h2>
+                <nav class="navigation">
+                    <a href="">Home</a>
+                    <a href="">About</a>
+                    <a href="">Services</a>
+                    <a href="">Contact</a>
+
+
+                </nav>
+            </header>
+            <!--------------------------------Navbar----End------------------------------------------------------------------------------------------------>
+
+
+
+
+
+            <!--------------------------------Login----Start------------------------------------------------------------------------------------------------>
+            <div class="rwrapper">
+                <form @submit.prevent="registerUser">
+                    <h1>User Registration</h1>
+
+                    <div class="rinput-box">
+                        <div class="rinput-field">
+                            <input type="text" placeholder="Email" name="email" v-model="email">
+                            <i><ion-icon name="person"></ion-icon></i>
+                        </div>
+                        <div class="rinput-field">
+                            <input type="password" placeholder="Password" v-model="password" name="password">
+                            <i><ion-icon name="logo-web-component"></ion-icon></i>
+                        </div>
+                    </div>
+
+
+                    <div class="rinput-box">
+                        <div class="rinput-field">
+                            <select multiple v-model="selectedSubjs">
+                                <option v-for="subject in subjects" :key="subject.id" :value="subject.name">{{
+                                    subject.name }}</option>
+                            </select>
+                            <i><ion-icon name="albums"></ion-icon></i>
+                        </div>
+
+                    </div>
+
+
+
+                    <label for="" class="rlabel"><input type="checkbox" class="rinput"> I herby declare that the above
+                        information provided is true and correct</label>
+
+                    <button class="rbtn">Register</button>
+                    <div class="login-register">
+                        <p>Already have an account ? <a href="#" @click="$router.push({name:'Login'})">Login now</a></p>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
     </div>
 </template>
 
@@ -48,7 +111,6 @@
                         },
                         body: JSON.stringify({email : this.email, password : this.password, pref_subjects : this.selectedSubjs})
                     })
-                    console.log(this.selectedSubjs)
                     alert("User Registered Successfully")
                     this.$router.push('/')
 
@@ -68,5 +130,41 @@
 </script>
 
 <style scoped>
+/* Reset .rinput-field to be positioned relative */
+.rinput-field {
+    position: relative;
+}
 
+/* Style the select to look like an input */
+.rinput-field select {
+    width: 100%;
+    padding: 12px 16px 12px 42px;
+    /* extra left padding for icon */
+    border: 1px solid #888;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    background-color: white;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* Make multi-select height consistent */
+.rinput-field select[multiple] {
+    height: 48px;
+    overflow-y: auto;
+}
+
+/* Position the icon absolutely */
+.rinput-field i {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 1.2rem;
+    color: #555;
+}
 </style>
