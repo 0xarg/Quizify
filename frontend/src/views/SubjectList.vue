@@ -45,7 +45,7 @@
         <div class="main--content">
             <div class="header--wrapper">
                 <div class="header--title">
-                    <span>Welcome {{ uname }}</span>
+                    <span>Welcome {{ name }}</span>
                     <h2>Dashboard</h2>
                 </div>
                 <div class="user--info">

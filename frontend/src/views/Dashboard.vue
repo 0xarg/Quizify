@@ -35,7 +35,7 @@
                     </a>
                 </li>
                 <li class="logout">
-                    <a href="/">
+                    <a href="#" @click="logout">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Log Out</span>
                     </a>
@@ -238,6 +238,12 @@ export default {
         }
     },
     methods: {
+        logout(){
+            localStorage.removeItem('user')
+            this.$router.push('/')
+        },
+
+
         async create_csv() {
             console.log("Button clicked, create_csv method triggered");
 

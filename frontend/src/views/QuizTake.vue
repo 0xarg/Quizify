@@ -1,47 +1,5 @@
 <template>
-    <!-- <div>
-        <div v-if="!isSubmitted">
-            <h1>📝 Take Quiz: {{ quiz_id }}</h1>
-            <h3>⏳ Duration: {{ quiz.duration }} minutes</h3>
-            <h3>⏳ Total Marks: {{ TotalMarks }} </h3>
-            <h3>⏱️ Time Remaining: {{ fTime}}</h3>
-
-            <hr>
-        </div>
-        <div v-else>
-            <h1>🎉 Quiz Completed!</h1>
-            <h2>⭐ You scored {{ AcheivedMarks }} out of {{ TotalMarks }}</h2>
-            <h2>⭐ Your Quiz Submition Status: {{ status }}</h2>
-
-            <button @click="retakeQuiz">🔄 Retake Quiz</button>
-        </div>
-
-        <div v-for="(question,qIndex) in quiz.questions" :key="question.id" class="question-card">
-            <h4>Q{{ question.id}}. {{ question.statement }} ({{question.marks}} Mark)</h4>
-
-            <ul>
-                <li v-if="!isSubmitted" v-for="(option, index) in question.options" :key="index">
-                    <label>
-                        <input type="radio" :name="'question-' + qIndex" :value="option"
-                            v-model="selectedOptions[qIndex]" />
-                        {{ option }}
-                    </label>
-                </li>
-                <li v-if="isSubmitted" v-for="(option, index) in question.options" :key="index" :class="{
-                    'correct-answer': option === question.correct_answer,
-                    'incorrect-answer': option !== question.correct_answer
-                }">
-                    {{ option }}
-                </li>
-            </ul>
-            <div v-if="isSubmitted">
-                <p v-if="selectedOptions[qIndex] === question.correct_answer" class="correct-answer">Correct</p>
-                <p v-else class="incorrect-answer">Incorrect. Correct answer is: {{ question.correct_answer }}</p>
-            </div>
-        </div>
-
-        <button v-if="!isSubmitted" @click=" submitQuiz">🚀 Submit Quiz</button>
-    </div> -->
+ 
     <div class="quiz-wrapper">
         <div v-if="!isSubmitted">
             <section class="quiz-info-card">

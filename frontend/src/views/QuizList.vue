@@ -172,13 +172,10 @@
 </template>
 
 <script>
-import QuizCard from '@/components/QuizCard.vue';
 
     export default {
         name: 'QuizList',
-        components: {
-            QuizCard,
-        },
+  
         props:["cid","cname","tquiz"],
         data() {
             return{

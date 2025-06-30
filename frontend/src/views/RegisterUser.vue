@@ -140,15 +140,12 @@
     width: 100%;
     padding: 12px 16px 12px 42px;
     /* extra left padding for icon */
-    border: 1px solid #888;
-    border-radius: 8px;
+    border: 2px solid #888;
+    border-radius: 5px;
     font-size: 1rem;
     font-family: inherit;
-    box-sizing: border-box;
+    /* box-sizing: border-box; */
     background-color: white;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
 }
 
 /* Make multi-select height consistent */
