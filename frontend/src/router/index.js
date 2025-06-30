@@ -138,11 +138,6 @@ const routes = [
     }),
   },
   {
-    path: "/AllSubjects/",
-    name: "AllSubjects",
-    component: SubjectChapters,
-  },
-  {
     path: "/Quizes/:chapter_id",
     name: "QuizList",
     component: QuizList,

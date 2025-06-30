@@ -4,7 +4,7 @@
             <div class="dash-logo"></div>
             <ul class="menu">
                 <li class="active">
-                    <a href="/brand_home">
+                    <a href="#" @click="$router.push({name:'dash'})">
                         <i class="fas fa-tachometer-alt"></i>
                         <span>Dashboard</span>
                     </a>

@@ -4,7 +4,7 @@
             <div class="dash-logo"></div>
             <ul class="menu">
                 <li class="active">
-                    <a href="/brand_home">
+                    <a href="#" @click="$router.push({ name: 'dash' })">
                         <i class="fas fa-tachometer-alt"></i>
                         <span>Dashboard</span>
                     </a>
@@ -16,9 +16,9 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="#" @click="$router.push({name:'SubjectList'})">
                         <i class="fas fa-chart-bar"></i>
-                        <span>Statistics</span>
+                        <span>Subjects</span>
                     </a>
                 </li>
                 <li>
@@ -47,8 +47,8 @@
                 <div id="desc-AdminQuiz">
                     <h2>Exam: </h2>
                     <h2>Quiz-{{ quiz.id }}</h2>
-                    <h6>Chapter :</h6>
-                    <h6>{{ cname }}</h6>
+                    <h6>Chapter : </h6>
+                    <h6>{{ quiz["chapter.name"] }}</h6>
                     <h6>Duration : </h6>
                     <h6>{{ quiz.duration }} (HH:MM:SS)</h6>
                     <h6>Remarks :</h6>
@@ -93,146 +93,6 @@
     </div>
 
 
-    <!-- 
-    <div>
-        <div id="sidebar-AdminQuiz">
-            <div id="desc-AdminQuiz">
-                <h2>Exam: </h2>
-                <h2>Quiz-{{ quiz.id }}</h2>
-                <h6>Chapter :</h6>
-                <h6>{{ cname }}</h6>
-                <h6>Duration : </h6>
-                <h6>{{ quiz.duration }} (HH:MM:SS)</h6>
-                <h6>Remarks :</h6>
-                <h6>{{ quiz.remarks }}</h6>
-                <h6>Total Marks :</h6>
-                <h6>{{ totalMarks }}</h6>
-            </div>
-            <hr>
-        </div>
-
-        <div class="sidebar">
-            <div class="dash-logo"></div>
-            <ul class="menu">
-                <li class="active">
-                    <a href="/brand_home">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a :href="`/brand_profile/${sid}`">
-                        <i class="fas fa-user"></i>
-                        <span>Profile</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Statistics</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/new_camp">
-                        <i class="fa-solid fa-snowflake"></i>
-                        <span>Campaign</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
-                    </a>
-                </li>
-                <li class="logout">
-                    <a href="/brand_login">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Log Out</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-        <div id="quiz-AdminQuiz">
-            <div id="ques-box-AdminQuiz" v-for="question in quiz.questions" :key="question.id">
-                <h5>Q{{ question.id }}. {{ question.statement }} ({{ question.marks }} Mark)</h5>
-
-                <ol>
-                    <li v-for="(option, index) in question.options" :key="index" :class="{
-                        'correct-answer': option === question.correct_answer,
-                        'incorrect-answer': option !== question.correct_answer
-                    }">
-                        {{ option }}
-                    </li>
-                </ol>
-                <div id="ques-btns">
-
-                    <button class="abtn" style="width:80px;" data-bs-toggle="modal" data-bs-target="#changeModal"
-                        @click="changeInit(question)">Edit
-                    </button>
-                    <button @click="deleteQues(question.id)" class="abtn" id="delbtn"
-                        style="width: 100px; margin: 0px 0px">delete</button>
-                </div>
-                <hr>
-            </div>
-
-            <div id="addQues">
-                <button style="margin-bottom: 50px;" class="abtn" data-bs-toggle="modal"
-                    data-bs-target="#exampleModal">Add
-                </button>
-            </div>
-
-        </div>
-    </div> -->
-    <!-- <div id="top-container-AdminQuiz">
-        
-
-        <div id="sidebar-AdminQuiz">
-            <div id="desc-AdminQuiz">
-                <h2>Exam: </h2>
-                <h2>Quiz-{{ quiz.id }}</h2>
-                <h6>Chapter :</h6>
-                <h6>{{ cname }}</h6>
-                <h6>Duration : </h6>
-                <h6>{{ quiz.duration }} (HH:MM:SS)</h6>
-                <h6>Remarks :</h6>
-                <h6>{{ quiz.remarks }}</h6>
-                <h6>Total Marks :</h6>
-                <h6>{{ totalMarks }}</h6>
-            </div>
-            <hr>
-        </div>
-        <div class="divider-AdminQuiz"></div>
-        <div id="quiz-AdminQuiz">
-            <div id="ques-box-AdminQuiz" v-for="question in quiz.questions" :key="question.id">
-                <h5>Q{{ question.id }}. {{ question.statement }} ({{ question.marks }} Mark)</h5>
-
-                <ol>
-                    <li v-for="(option, index) in question.options" :key="index" :class="{
-                        'correct-answer': option === question.correct_answer,
-                        'incorrect-answer': option !== question.correct_answer
-                    }">
-                        {{ option }}
-                    </li>
-                </ol>
-                <div id="ques-btns">
-
-                    <button class="abtn" style="width:80px;" data-bs-toggle="modal" data-bs-target="#changeModal"
-                        @click="changeInit(question)">Edit
-                    </button>
-                    <button @click="deleteQues(question.id)" class="abtn" id="delbtn"
-                        style="width: 100px; margin: 0px 0px">delete</button>
-                </div>
-                <hr>
-            </div>
-
-            <div id="addQues">
-                <button style="margin-bottom: 50px;" class="abtn" data-bs-toggle="modal"
-                    data-bs-target="#exampleModal">Add
-                </button>
-            </div>
-
-        </div>
-    </div> -->
 
 
     <!-- Modals -->

@@ -17,9 +17,9 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="#" @click="$router.push({name:'SubjectList'})">
                         <i class="fas fa-chart-bar"></i>
-                        <span>Statistics</span>
+                        <span>Subjects</span>
                     </a>
                 </li>
                 <li>
@@ -166,7 +166,7 @@
                                 <td>{{subject.name}}</td>
                                 <td>{{subject.description}}</td>
                                 <td> {{subject.chapters ? subject.chapters.length : 0}}</td>
-                                <td><button class="yellow-btn">View</button></td>
+                                <td><button class="yellow-btn" @click="$router.push({name:'ChapterList',params:{subject_id:subject.id}})">View</button></td>
 
 
                             </tr>
@@ -192,7 +192,7 @@
                                 <td>{{ chapter.name }}</td>
                                 <td>{{chapter.subjectName}}</td>
                                 <td> {{chapter.description}} </td>
-                                <td><button class="yellow-btn">View</button></td>
+                                <td><button class="yellow-btn" @click="$router.push({name:'QuizList', params:{chapter_id:chapter.id}})">View</button></td>
                             </tr>
                         </tbody>
                     </table>
@@ -216,7 +216,8 @@
                                 <td>Quiz {{quiz.id}}</td>
                                 <td>{{quiz.chapterName}}</td>
                                 <td> {{quiz.duration}}</td>
-                                <td><button class="green-btn">View</button></td>
+                                <td v-if="$store.state.roles == 'admin'"><button @click="$router.push({name:'Quiz', params:{quiz_id:quiz.id}})" class="green-btn">View</button></td>
+                                <td v-if="$store.state.roles == 'user'"><button class="green-btn">Take Quiz</button></td>
                             </tr>
                         </tbody>
 
