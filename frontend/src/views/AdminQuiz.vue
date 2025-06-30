@@ -1,46 +1,6 @@
 <template>
     <div id="adminMain">
-        <div class="sidebar">
-            <div class="dash-logo"></div>
-            <ul class="menu">
-                <li class="active">
-                    <a href="#" @click="$router.push({ name: 'dash' })">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a :href="`/brand_profile/${sid}`">
-                        <i class="fas fa-user"></i>
-                        <span>Profile</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" @click="$router.push({name:'SubjectList'})">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Subjects</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/new_camp">
-                        <i class="fa-solid fa-snowflake"></i>
-                        <span>Campaign</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
-                    </a>
-                </li>
-                <li class="logout">
-                    <a href="/brand_login">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Log Out</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
+        <Sidebar />
 
         <div class="content-area-adminQuiz">
             <div id="sidebar-AdminQuiz">
@@ -211,8 +171,13 @@
 </template>
 
 <script>
+import Sidebar from '@/components/sidebar.vue'
+
     export default {
         name: "AdminQuiz",
+        components:{
+            Sidebar
+        },
         props:["quiz_id","remarks","cid","cname","tques"],
         data(){
             return{

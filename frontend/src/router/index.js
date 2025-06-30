@@ -41,7 +41,6 @@ const routes = [
     },
   },
 
-
   {
     path: "/Chapters/:subject_id",
     name: "ChapterList",
@@ -66,6 +65,10 @@ const routes = [
       cname: route.query.chapter_name,
       tquiz: route.query.totalQuiz,
     }),
+    meta: {
+      requiresLogin: true,
+      role: ["admin", "user"],
+    },
   },
 
   {
@@ -79,6 +82,10 @@ const routes = [
       cid: route.query.chapter_id,
       cname: route.query.chapter_name,
     }),
+    meta: {
+      requiresLogin: true,
+      role: ["admin"],
+    },
   },
   {
     path: "/TakeQuiz/:quiz_id",
@@ -88,8 +95,11 @@ const routes = [
       quiz_id: route.params.quiz_id,
       cid: route.query.chapter_id,
     }),
+    meta: {
+      requiresLogin: true,
+      role: ["user"],
+    },
   },
-
 ];
 
 const router = createRouter({

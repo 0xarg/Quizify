@@ -1,52 +1,12 @@
 <template>
     <div class="dash-camp-body">
-        <div class="sidebar">
-            <div class="dash-logo"></div>
-            <ul class="menu">
-                <li class="active">
-                    <a @click="$router.push({ name: 'dash'})">
-                        <i class=" fas fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a :href="`/brand_profile/${sid}`">
-                        <i class="fas fa-user"></i>
-                        <span>Profile</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Statistics</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/new_camp">
-                        <i class="fa-solid fa-snowflake"></i>
-                        <span>Subjects</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
-                    </a>
-                </li>
-                <li class="logout">
-                    <a href="/brand_login">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Log Out</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
+        <Sidebar/>
 
         <div class="main--content">
             <div class="header--wrapper">
                 <div class="header--title">
-                    <h2>{{ sname }}</h2>
-                    <span>Total Chapters: {{ tchapters }}</span>
+                    <h2 v-if="chapters.length">{{ chapters[0]['subject.name'] }}</h2>
+                    <span>Total Chapters: {{ chapters.length }}</span>
                 </div>
                 <div class="user--info">
                     <div class="search--box">
@@ -166,10 +126,14 @@
 </template>
 
 <script>
+import Sidebar from '@/components/sidebar.vue'
+
 
     export default {
         name: 'ChapterList',
-
+        components:{
+            Sidebar
+        },
     props: ["sid", "sname", "tchapters"],
         data() {
             return{
