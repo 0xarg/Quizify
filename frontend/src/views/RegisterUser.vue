@@ -14,72 +14,68 @@
         <br>
         <button @click="registerUser"> Register</button>
     </div> -->
-    <div>
-        <div class="body-start">
-            <!--------------------------------Navbar----Start------------------------------------------------------------------------------------------------>
-            <header>
-                <h2 class="logo">InfluenSync</h2>
-                <nav class="navigation">
-                    <a href="">Home</a>
-                    <a href="">About</a>
-                    <a href="">Services</a>
-                    <a href="">Contact</a>
 
+    <div class="body-start-sponsor">
+        <header>
+            <h2 class="logo">Quizify</h2>
+            <nav class="navigation">
+                <a href="">Home</a>
+                <a href="">About</a>
+                <a href="">Services</a>
+                <a href="">Contact</a>
 
-                </nav>
-            </header>
-            <!--------------------------------Navbar----End------------------------------------------------------------------------------------------------>
+            </nav>
+        </header>
+        <!--------------------------------Navbar----End------------------------------------------------------------------------------------------------>
 
 
 
 
 
-            <!--------------------------------Login----Start------------------------------------------------------------------------------------------------>
-            <div class="rwrapper">
+        <!--------------------------------Login----Start------------------------------------------------------------------------------------------------>
+        <div class="wrapper">
+
+            <div class="form-box Login">
+                <h2>User Registration</h2>
+                <!-- <button></button> -->
                 <form @submit.prevent="registerUser">
-                    <h1>User Registration</h1>
-
-                    <div class="rinput-box">
-                        <div class="rinput-field">
-                            <input type="text" placeholder="Email" name="email" v-model="email">
-                            <i><ion-icon name="person"></ion-icon></i>
-                        </div>
-                        <div class="rinput-field">
-                            <input type="password" placeholder="Password" v-model="password" name="password">
-                            <i><ion-icon name="logo-web-component"></ion-icon></i>
-                        </div>
-                    </div>
-
-
-                    <div class="rinput-box">
-                        <div class="rinput-field">
-                            <select multiple v-model="selectedSubjs">
-                                <option v-for="subject in subjects" :key="subject.id" :value="subject.name">{{
-                                    subject.name }}</option>
-                            </select>
-                            <i><ion-icon name="albums"></ion-icon></i>
-                        </div>
+                    <div class="input-box">
+                        <span class="start-icon">
+                            <ion-icon name="mail"></ion-icon>
+                        </span>
+                        <input type="email" required name="email" v-model="email">
+                        <label for="Email">Email</label>
 
                     </div>
+                    <div class="input-box">
+                        <span class="start-icon"><ion-icon name="lock-closed"></ion-icon></span>
+                        <input type="password" required name="password" v-model="password">
+                        <label>Password</label>
+                    </div>
+                    <div class="input-box select-box">
 
+                        <select v-model="selectedSubjs" multiple>
+                            <option v-for="subject in subjects" :key="subject.id" :value="subject.name">{{
+                                subject.name }}</option>
+                        </select>
 
+                        <span class="start-icon"><ion-icon name="albums"></ion-icon></span>
+                    </div>
 
-                    <label for="" class="rlabel"><input type="checkbox" class="rinput"> I herby declare that the above
-                        information provided is true and correct</label>
-
-                    <button class="rbtn">Register</button>
+                    <button type="submit" class="btn">Register</button>
                     <div class="login-register">
-                        <p>Already have an account ? <a href="#" @click="$router.push({name:'Login'})">Login now</a></p>
-
+                        <p>Already have an account ? <a href="#" @click="$router.push({ name: 'Login' })">Login now</a>
+                        </p>
                     </div>
-                </form>
 
+                </form>
             </div>
         </div>
-    </div>
+        </div>
 </template>
 
 <script>
+
     export default {
         name: "RegisterUser",
         data() {

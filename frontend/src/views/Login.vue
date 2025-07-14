@@ -1,15 +1,4 @@
 <template>
-    <!DOCTYPE html>
-    <html lang="en">
-
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Quizify</title>
-        <link rel="stylesheet" href="/static/style.css">
-
-    </head>
-
     <body class="body-start-sponsor">
         <header>
             <h2 class="logo">Quizify</h2>
@@ -43,7 +32,7 @@
                     <label for=""><input type="checkbox">Remember me</label>
                     <a href="">Forget Password?</a>
                 </div>
-                <button @click='submitLogin' class="btn">Login</button>
+                <button @click='submitLogin' class="btn login-btn">Login</button>
                 <div class="login-register">
                     <p>Don't have an account ? <a @click="$router.push({ name: 'registerUser' })">Register now</a></p>
                 </div>
@@ -52,8 +41,6 @@
         </div>
 
     </body>
-
-    </html>
 </template>
 
 <script>
