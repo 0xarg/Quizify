@@ -533,7 +533,31 @@ class GetCSV(Resource):
             return send_file(file_path, as_attachment=True)
         else:
             return {'message':'Report is not ready yet'},405
+        
+        
+class AdminSummaryTopScores(Resource):
+    def get(self):
+        result = db.session.query(Subject.name.label('subject'),db.func.max(Scores.total_score).label('top_score')).join(Chapter).join(Quiz).join(Scores).group_by(Subject.name).all()
+        return [{'subject':s,'top_score':t} for s,t in result]
 
+class AdminSummaryUserCount(Resource):
+    def get(self):
+        count = User.query.count()
+        return {'count': count}
+
+class UserSummaryQuizStats(Resource):
+    def get(self,user_id):
+        quizCount = db.session.query(Subject.name.label('subject'),db.func.count(Quiz.id).label('count')).join(Chapter).join(Quiz).group_by(Subject.name).all()
+        attemptCount = db.session.query(Subject.name.label('subject'),db.func.count(Scores.id).label('count')).join(Chapter).join(Quiz).join(Scores).filter(Scores.user_id == user_id).group_by(Subject.name).all()
+        
+        return {
+            'quizCount' :[{'subject':s,'count':c} for s,c in quizCount],
+            'attempCount' :[{'subject':s,'count':c} for s,c in attemptCount]
+        }
+
+api.add_resource(AdminSummaryTopScores,"/admin/top-scores")
+api.add_resource(AdminSummaryUserCount,"/admin/total-users")
+api.add_resource(UserSummaryQuizStats,"/user/<int:user_id>/quiz-stats")
 
 api.add_resource(UserAPI,"/users/<int:user_id>")
 api.add_resource(UserListAPI,"/users")
