@@ -8,6 +8,7 @@ import QuizList from '@/views/QuizList.vue';
 import QuizTake from '@/views/QuizTake.vue';
 import RegisterUser from '@/views/RegisterUser.vue';
 import AdminQuiz from '@/views/AdminQuiz.vue';
+import AdminSummary from '@/views/AdminSummary.vue';
 
 const routes = [
   {
@@ -98,6 +99,16 @@ const routes = [
     meta: {
       requiresLogin: true,
       role: ["user"],
+    },
+  },
+
+  {
+    path: "/admin/stats",
+    name: "AdminStats",
+    component: AdminSummary,
+    meta: {
+      requiresLogin: true,
+      role: ["admin"],
     },
   },
 ];

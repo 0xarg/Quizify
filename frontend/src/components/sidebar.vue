@@ -10,9 +10,13 @@
                     </a>
                 </li>
                 <li>
-                    <a>
-                        <i class="fas fa-user"></i>
-                        <span>Proifle</span>
+                    <a v-if="$store.state.roles == 'admin'" @click="$router.push({ name: 'AdminStats' })">
+                        <i class="fas fa-square-poll-vertical"></i>
+                        <span>Summary</span>
+                    </a>
+                    <a v-if="$store.state.roles == 'user'" @click="$router.push({ name: 'AdminStats' })">
+                        <i class="fas fa-square-poll-vertical"></i>
+                        <span>Summasry</span>
                     </a>
                 </li>
                 <li>

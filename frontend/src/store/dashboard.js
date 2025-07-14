@@ -4,7 +4,7 @@ export default {
   namespaced: true,
   state: {
     topScores: [],
-    totalUsers: 0,
+    subjectAttempts: 0,
     quizCounts: [],
     attemptCounts: [],
   },
@@ -13,8 +13,8 @@ export default {
     setTopScores(state, data) {
       state.topScores = data;
     },
-    setTotalUsers(state, count) {
-      state.totalUsers = count;
+    setSubjectAttempts(state, data) {
+      state.subjectAttempts = data;
     },
     setQuizCounts(state, data) {
       state.quizCounts = data;
@@ -26,12 +26,12 @@ export default {
 
   actions:{
     async fetchAdminData({ commit }){
-        const [scoresRes, usersRes] = await Promise.all([
+        const [scoresRes, attemptsRes] = await Promise.all([
           axios.get("http://localhost:5000/api/admin/top-scores"),
-          axios.get("http://localhost:5000/api/admin/total-users"),
+          axios.get("http://localhost:5000/api/admin/subject-attempts"),
         ]);
         commit('setTopScores',scoresRes.data);
-        commit('setTotalUsers',usersRes.data.count)
+        commit("setSubjectAttempts", attemptsRes.data);
     },
     async fetchUserData( { commit }, user_id) {
         const res = await axios.get(

@@ -537,26 +537,43 @@ class GetCSV(Resource):
         
 class AdminSummaryTopScores(Resource):
     def get(self):
-        result = db.session.query(Subject.name.label('subject'),db.func.max(Scores.total_score).label('top_score')).join(Chapter).join(Quiz).join(Scores).group_by(Subject.name).all()
+        result = db.session.query(
+            Subject.name.label('subject'),
+            db.func.coalesce(db.func.max(Scores.total_score), 0).label('top_score')
+        ).outerjoin(Chapter, Chapter.subject_id == Subject.id) \
+         .outerjoin(Quiz, Quiz.chapter_id == Chapter.id) \
+         .outerjoin(Scores, Scores.quiz_id == Quiz.id) \
+         .group_by(Subject.name) \
+         .order_by(Subject.name).all()
+        print(result)
         return [{'subject':s,'top_score':t} for s,t in result]
 
-class AdminSummaryUserCount(Resource):
+class AdminSummaryUserSubject(Resource):
     def get(self):
-        count = User.query.count()
-        return {'count': count}
+        results = db.session.query(
+            Subject.name.label('subject'),
+            db.func.count(Scores.id).label('attempts')
+        ).outerjoin(Chapter, Chapter.subject_id == Subject.id) \
+         .outerjoin(Quiz, Quiz.chapter_id == Chapter.id) \
+         .outerjoin(Scores, Scores.quiz_id == Quiz.id) \
+         .group_by(Subject.name) \
+         .order_by(Subject.name).all()
+        print(results)
+        return [{'subject': s, 'attempts': a} for s, a in results]
 
 class UserSummaryQuizStats(Resource):
     def get(self,user_id):
         quizCount = db.session.query(Subject.name.label('subject'),db.func.count(Quiz.id).label('count')).join(Chapter).join(Quiz).group_by(Subject.name).all()
         attemptCount = db.session.query(Subject.name.label('subject'),db.func.count(Scores.id).label('count')).join(Chapter).join(Quiz).join(Scores).filter(Scores.user_id == user_id).group_by(Subject.name).all()
-        
+        print(quizCount)
+        print(attemptCount)
         return {
             'quizCount' :[{'subject':s,'count':c} for s,c in quizCount],
             'attempCount' :[{'subject':s,'count':c} for s,c in attemptCount]
         }
 
 api.add_resource(AdminSummaryTopScores,"/admin/top-scores")
-api.add_resource(AdminSummaryUserCount,"/admin/total-users")
+api.add_resource(AdminSummaryUserSubject, "/admin/subject-attempts")
 api.add_resource(UserSummaryQuizStats,"/user/<int:user_id>/quiz-stats")
 
 api.add_resource(UserAPI,"/users/<int:user_id>")

@@ -29,9 +29,14 @@
 </script>
 
     <style scoped>
-        .chart-container {
-            width: 100%;
-            max-width: 600px;
-            margin: auto;
-        }
-    </style>
+    .chart-container {
+        width: 100%;
+        max-width: 600px;
+        margin: auto;
+        padding: 1rem;
+    }
+
+    canvas {
+        max-height: 400px;
+    }
+</style>

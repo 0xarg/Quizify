@@ -12,7 +12,7 @@ import ChartCard from '@/components/ChartCard.vue';
 
 export default {
     components: { ChartCard },
-    props: { userId: { type: Number, required: true } },
+    props: { user_id: { type: Number, required: true } },
     computed: {
         ...mapState('dashboard', ['quizCounts', 'attemptCounts']),
         quizLabels() { return this.quizCounts.map(o => o.subject) },
@@ -25,8 +25,9 @@ export default {
         }
     },
     mounted() {
-        this.$store.dispatch('dashboard/fetchUserData', this.userId);
+        this.$store.dispatch('dashboard/fetchUserData', this.user_id);
     }
 };
 </script>
   
+

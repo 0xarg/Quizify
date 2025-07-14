@@ -1,8 +1,12 @@
 <template>
     <div>
         <h1>Admin Dashboard</h1>
-        <ChartCard v-if="labelsScores.length" :chart-data="topScoresChart" />
-        <ChartCard v-if="totalUsers !== null" :chart-data="userCountChart" chart-type="doughnut" />
+
+        <!-- Chart 1: Top Scores per Subject -->
+        <ChartCard v-if="topScoresChart.labels.length" :chart-data="topScoresChart" />
+
+        <!-- Chart 2: User Attempts per Subject -->
+        <ChartCard v-if="attemptsChart.labels.length" :chart-data="attemptsChart" />
     </div>
 </template>
 
@@ -13,18 +17,29 @@ import ChartCard from '@/components/ChartCard.vue';
 export default {
     components: { ChartCard },
     computed: {
-        ...mapState('dashboard', ['topScores', 'totalUsers']),
-        labelsScores() { return this.topScores.map(o => o.subject) },
+        ...mapState('dashboard', ['topScores', 'subjectAttempts']),
+
         topScoresChart() {
+            const scores = Array.isArray(this.topScores) ? this.topScores : [];
             return {
-                labels: this.labelsScores,
-                datasets: [{ label: 'Top Scores', data: this.topScores.map(o => o.top_score), backgroundColor: 'rgba(75,192,192,0.5)' }]
+                labels: scores.map(o => o.subject),
+                datasets: [{
+                    label: 'Top Scores',
+                    data: scores.map(o => o.top_score),
+                    backgroundColor: 'rgba(75,192,192,0.5)'
+                }]
             };
         },
-        userCountChart() {
+
+        attemptsChart() {
+            const attempts = Array.isArray(this.subjectAttempts) ? this.subjectAttempts : [];
             return {
-                labels: ['Users'],
-                datasets: [{ label: 'Total Users', data: [this.totalUsers], backgroundColor: ['rgba(255,99,132,0.5)'] }]
+                labels: attempts.map(a => a.subject),
+                datasets: [{
+                    label: 'User Attempts by Subject',
+                    data: attempts.map(a => a.attempts),
+                    backgroundColor: 'rgba(255,159,64,0.6)'
+                }]
             };
         }
     },

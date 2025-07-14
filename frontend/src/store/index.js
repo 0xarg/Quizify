@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import dashboard from './dashboard';
 
 const store = createStore({
   state: {
@@ -42,6 +43,7 @@ const store = createStore({
   actions: {
   },
   modules: {
+    dashboard
   }
 })
 store.commit("setUser");
