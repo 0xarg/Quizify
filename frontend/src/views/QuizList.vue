@@ -3,18 +3,7 @@
         <Sidebar />
 
         <div class="main--content">
-            <div class="header--wrapper">
-                <div class="header--title">
-                    <h2>{{ cname }}</h2>
-                    <span>Total Quizes: {{ tquiz }}</span>
-                </div>
-                <div class="user--info">
-                    <div class="search--box">
-                        <i class="fa-solid fa-search"></i>
-                        <input type="text" class="sin" name="" id="" placeholder="Search" />
-                    </div>
-                </div>
-            </div>
+            <Topbar :pname="cname" :count="tquiz"/>
 
             <div class="card--container">
                 <h3 class="main--title">Quizes</h3>
@@ -133,11 +122,12 @@
 
 <script>
 import Sidebar from '@/components/sidebar.vue';
+import Topbar from '@/components/Topbar.vue';
 
 
     export default {
         name: 'QuizList',
-        components: {Sidebar},
+        components: {Sidebar, Topbar},
   
         props:["cid","cname","tquiz"],
         data() {

@@ -62,7 +62,7 @@
                         <span class="start-icon"><ion-icon name="albums"></ion-icon></span>
                     </div>
 
-                    <button type="submit" class="btn">Register</button>
+                    <button type="submit" class="btn login-btn">Register</button>
                     <div class="login-register">
                         <p>Already have an account ? <a href="#" @click="$router.push({ name: 'Login' })">Login now</a>
                         </p>

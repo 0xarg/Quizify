@@ -129,7 +129,7 @@ router.beforeEach((to,from,next) => {
       alert(
         "Only Authorized Users has Access to this Page. Redirecting to Home....."
       );
-      next({ path: "/" });
+      next({ path: "/dashboard" });
     } else {
       next();
     }

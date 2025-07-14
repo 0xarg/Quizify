@@ -1,20 +1,9 @@
 <template>
     <div class="dash-camp-body">
-        <Sidebar/>
+        <Sidebar />
 
         <div class="main--content">
-            <div class="header--wrapper">
-                <div class="header--title">
-                    <h2 v-if="chapters.length">{{ chapters[0]['subject.name'] }}</h2>
-                    <span>Total Chapters: {{ chapters.length }}</span>
-                </div>
-                <div class="user--info">
-                    <div class="search--box">
-                        <i class="fa-solid fa-search"></i>
-                        <input type="text" class="sin" name="" id="" placeholder="Search" />
-                    </div>
-                </div>
-            </div>
+            <Topbar :pname="chapters.length ? chapters[0]['subject.name'] : ''" :count="chapters.length" />
 
             <div class="card--container">
                 <h3 class="main--title">Chapters</h3>
@@ -127,12 +116,13 @@
 
 <script>
 import Sidebar from '@/components/sidebar.vue'
+import Topbar from '@/components/Topbar.vue'
 
 
     export default {
         name: 'ChapterList',
         components:{
-            Sidebar
+            Sidebar,Topbar
         },
     props: ["sid", "sname", "tchapters"],
         data() {

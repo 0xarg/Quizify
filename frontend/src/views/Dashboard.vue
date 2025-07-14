@@ -3,27 +3,7 @@
 
         <Sidebar />
         <div class="main--content">
-            <div class="header--wrapper">
-                <div class="header--title">
-                    <span>Welcome </span> <span style="font-weight: bold; text-decoration:underline ">{{ uname }}</span>
-                    <br>
-                    <span style="font-weight: bold; color:red "> {{ msg }}</span>
-                    <h2>Dashboard</h2>
-                    <!-- <h3>Ratings</h3> -->
-                </div>
-                <div class="user--info">
-                    <div class="search--box">
-
-                        <i class="fa-solid fa-search">
-
-                        </i>
-                        <input type="text" class="sin" name="" id="" placeholder="Search Subject">
-                    </div>
-                    <!-- <img src="/static/2.jpg" alt=""> -->
-
-                </div>
-
-            </div>
+            <Topbar :uname="$store.state.username"/>
 
             <div class="card--container">
                 <h3 class="main--title">
@@ -188,11 +168,12 @@
 
 <script>
 import Sidebar from '@/components/sidebar.vue';
+import Topbar from '@/components/Topbar.vue';
 
 export default {
     name: 'Admin-Dash',
     components:{
-        Sidebar
+        Sidebar,Topbar
     },
     data(){
         return{

@@ -1,4 +1,5 @@
 <template>
+
     <body class="body-start-sponsor">
         <header>
             <h2 class="logo">Quizify</h2>
@@ -34,9 +35,10 @@
                 </div>
                 <button @click='submitLogin' class="btn login-btn">Login</button>
                 <div class="login-register">
-                    <p>Don't have an account ? <a @click="$router.push({ name: 'registerUser' })">Register now</a></p>
+                    <p>Don't have an account ? <a href="#" @click="$router.push({ name: 'registerUser' })">Register
+                            now</a>
+                    </p>
                 </div>
-
             </div>
         </div>
 
