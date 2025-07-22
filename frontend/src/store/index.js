@@ -21,7 +21,7 @@ const store = createStore({
           state.auth_token = user.token;
           state.roles  = user.roles;
           state.loggedIn = true;
-          state.username = user.email?.split("@")[0] || "User";
+          state.username = user.email?.split('@')[0] || 'User';
           state.user_id = user.id;
         }
       } catch{

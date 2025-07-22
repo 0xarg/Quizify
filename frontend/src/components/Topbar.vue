@@ -1,7 +1,7 @@
 <template>
     <div class="header--wrapper">
         <div class="header--title">
-            <span >{{ uname }}</span>
+            <span >Welcome {{ uname }}</span>
             <span style="font-weight: bold; color:red "> {{ msg }}</span>
             <h2>{{ pname }}</h2>
             <span>{{ count }}</span>

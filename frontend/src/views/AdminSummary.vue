@@ -1,21 +1,24 @@
 <template>
-    <div>
-        <h1>Admin Dashboard</h1>
+    <div class="dashboard-container">
+        <Sidebar />
 
-        <!-- Chart 1: Top Scores per Subject -->
-        <ChartCard v-if="topScoresChart.labels.length" :chart-data="topScoresChart" />
+        <div class="content">
+            <h1>Admin Dashboard</h1>
 
-        <!-- Chart 2: User Attempts per Subject -->
-        <ChartCard v-if="attemptsChart.labels.length" :chart-data="attemptsChart" />
+            <ChartCard v-if="topScoresChart.labels.length" :chart-data="topScoresChart" />
+
+            <ChartCard v-if="attemptsChart.labels.length" :chart-data="attemptsChart" />
+        </div>
     </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import ChartCard from '@/components/ChartCard.vue';
+import Sidebar from '@/components/sidebar.vue';
 
 export default {
-    components: { ChartCard },
+    components: { ChartCard,Sidebar },
     computed: {
         ...mapState('dashboard', ['topScores', 'subjectAttempts']),
 
@@ -49,3 +52,17 @@ export default {
 };
 </script>
   
+<style scoped>
+.dashboard-container {
+    display: flex;
+}
+
+.content {
+    flex: 1;
+    padding: 2rem;
+}
+
+h1 {
+    text-align: center;
+}
+</style>

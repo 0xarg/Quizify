@@ -3,6 +3,7 @@ import re
 from flask import jsonify, request, current_app as app, send_file
 from flask_restful import Api, Resource, fields, marshal_with
 from pytz import timezone
+from sqlalchemy import extract
 from celery_tasks.tasks import send_reminders, user_quizCsv
 from models import *
 from flask_security import auth_required, current_user, hash_password
@@ -563,13 +564,28 @@ class AdminSummaryUserSubject(Resource):
 
 class UserSummaryQuizStats(Resource):
     def get(self,user_id):
-        quizCount = db.session.query(Subject.name.label('subject'),db.func.count(Quiz.id).label('count')).join(Chapter).join(Quiz).group_by(Subject.name).all()
-        attemptCount = db.session.query(Subject.name.label('subject'),db.func.count(Scores.id).label('count')).join(Chapter).join(Quiz).join(Scores).filter(Scores.user_id == user_id).group_by(Subject.name).all()
-        print(quizCount)
-        print(attemptCount)
+        quizCount = db.session.query(
+            Subject.name.label('subject'),
+            db.func.count(Quiz.id).label('count')
+        ).select_from(Subject) \
+            .join(Chapter, Chapter.subject_id == Subject.id) \
+            .join(Quiz, Quiz.chapter_id == Chapter.id) \
+            .group_by(Subject.name).all()
+
+        attemptCount = db.session.query(
+            extract('month', Scores.time).label('month'),
+            db.func.count(Scores.id).label('cnt')
+        ).select_from(Scores) \
+            .join(Quiz, Quiz.id == Scores.quiz_id) \
+            .filter(Scores.user_id == user_id) \
+            .group_by(extract('month', Scores.time)) \
+            .order_by(extract('month', Scores.time)).all()
+
+
         return {
             'quizCount' :[{'subject':s,'count':c} for s,c in quizCount],
-            'attempCount' :[{'subject':s,'count':c} for s,c in attemptCount]
+            'attemptCount': [{'month': int(m), 'count': c} for m, c in attemptCount]
+
         }
 
 api.add_resource(AdminSummaryTopScores,"/admin/top-scores")

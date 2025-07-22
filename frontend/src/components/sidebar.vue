@@ -14,9 +14,9 @@
                         <i class="fas fa-square-poll-vertical"></i>
                         <span>Summary</span>
                     </a>
-                    <a v-if="$store.state.roles == 'user'" @click="$router.push({ name: 'AdminStats' })">
+                    <a v-if="$store.state.roles == 'user'" @click="$router.push({ name: 'UserStats' })">
                         <i class="fas fa-square-poll-vertical"></i>
-                        <span>Summasry</span>
+                        <span>Summary</span>
                     </a>
                 </li>
                 <li>
