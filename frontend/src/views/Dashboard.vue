@@ -3,7 +3,7 @@
 
         <Sidebar />
         <div class="main--content">
-            <Topbar :uname="$store.state.username"/>
+            <Topbar :uname="$store.state.username" @search-subject="fetchSubjects" />
 
             <div class="card--container">
                 <h3 class="main--title">
@@ -68,7 +68,7 @@
 
 
 
-                    <div  v-if="$store.state.roles == 'user'" class="payment--card light-green">
+                    <div v-if="$store.state.roles == 'user'" class="payment--card light-green">
                         <div class="card--header">
                             <div class="amount">
                                 <span class="title">
@@ -103,7 +103,9 @@
                                 <td>{{subject.name}}</td>
                                 <td>{{subject.description}}</td>
                                 <td> {{subject.chapters ? subject.chapters.length : 0}}</td>
-                                <td><button class="yellow-btn" @click="$router.push({name:'ChapterList',params:{subject_id:subject.id}})">View</button></td>
+                                <td><button class="yellow-btn"
+                                        @click="$router.push({name:'ChapterList',params:{subject_id:subject.id}})">View</button>
+                                </td>
 
 
                             </tr>
@@ -129,7 +131,9 @@
                                 <td>{{ chapter.name }}</td>
                                 <td>{{chapter.subjectName}}</td>
                                 <td> {{chapter.description}} </td>
-                                <td><button class="yellow-btn" @click="$router.push({name:'QuizList', params:{chapter_id:chapter.id}})">View</button></td>
+                                <td><button class="yellow-btn"
+                                        @click="$router.push({name:'QuizList', params:{chapter_id:chapter.id}})">View</button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -153,8 +157,11 @@
                                 <td>Quiz {{quiz.id}}</td>
                                 <td>{{quiz.chapterName}}</td>
                                 <td> {{quiz.duration}}</td>
-                                <td v-if="$store.state.roles == 'admin'"><button @click="$router.push({name:'Quiz', params:{quiz_id:quiz.id}})" class="green-btn">View</button></td>
-                                <td v-if="$store.state.roles == 'user'"><button class="green-btn">Take Quiz</button></td>
+                                <td v-if="$store.state.roles == 'admin'"><button
+                                        @click="$router.push({name:'Quiz', params:{quiz_id:quiz.id}})"
+                                        class="green-btn">View</button></td>
+                                <td v-if="$store.state.roles == 'user'"><button class="green-btn">Take Quiz</button>
+                                </td>
                             </tr>
                         </tbody>
 
@@ -168,6 +175,8 @@
 
 <script>
 import Sidebar from '@/components/sidebar.vue';
+import axios from 'axios';
+
 import Topbar from '@/components/Topbar.vue';
 
 export default {
@@ -184,6 +193,12 @@ export default {
         logout(){
             localStorage.removeItem('user')
             this.$router.push('/')
+        },
+        async fetchSubjects_Search(searchTerm) {
+            await axios.get(`http://localhost:5000/api/subjects?search=${searchTerm}`)
+                .then(res => {
+                    this.subjects = res.data;
+                });
         },
 
 

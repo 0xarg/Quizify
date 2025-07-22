@@ -205,7 +205,13 @@ class SubjectListAPI(Resource):
     @cache.cached(timeout=1,key_prefix='subject_list')
     @marshal_with(subject_fields)
     def get(self):
-        subjects = Subject.query.all()
+        search = request.args.get('search', '').strip()
+
+        if search:
+            subjects = Subject.query.filter(
+                Subject.name.ilike(f"%{search}%")).all()
+        else:
+            subjects = Subject.query.all()
         return subjects
 
     def post(self):

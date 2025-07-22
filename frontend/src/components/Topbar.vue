@@ -1,8 +1,7 @@
 <template>
     <div class="header--wrapper">
         <div class="header--title">
-            <span >Welcome {{ uname }}</span>
-            <span style="font-weight: bold; color:red "> {{ msg }}</span>
+            <span>Welcome {{ uname }}</span>
             <h2>{{ pname }}</h2>
             <span>{{ count }}</span>
             <!-- <h3>Ratings</h3> -->
@@ -13,9 +12,9 @@
                 <i class="fa-solid fa-search">
 
                 </i>
-                <input type="text" class="sin" name="" id="" placeholder="Search Subject">
+                <input type="text" class="sin" placeholder="Search Subject" v-model="search" @input="handleSearch" />
+
             </div>
-            <!-- <img src="/static/2.jpg" alt=""> -->
 
         </div>
 
@@ -25,7 +24,17 @@
 <script>
     export default {
         name:'Topbar',
-      props:['pname','count','uname']
+      props:['pname','count','uname'],
+      data (){
+        return{
+            search:''
+        }
+      },
+      methods:{
+        handleSearch(){
+            this.$emit('search-subject', this.search)
+        }
+      }
     }
 </script>
 
