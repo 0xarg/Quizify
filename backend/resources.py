@@ -31,7 +31,7 @@ user_fields = {
     "email": fields.String,
     "pref_subjects": fields.Raw,
     "roles": fields.List(fields.String, attribute=lambda user: [role.name for role in user.roles]),
-    
+
 }
 
 
@@ -76,44 +76,46 @@ subject_fields = {
     "description": fields.String,
     "chapters": fields.List(fields.Nested(chapter_fields))
 }
+
+
 class UserAPI(Resource):
     @auth_required('token')
     @marshal_with(user_fields)
     def get(self, user_id):
         user = User.query.get(user_id)
         if not user:
-            return {"message": "User not found"},404
+            return {"message": "User not found"}, 404
         return user
-    
+
     @auth_required('token')
     def put(self, user_id):
         data = request.get_json()
         email = data.get('email')
         password = data.get("password")
         pref_subjects = data.get("pref_subjects")
-        
+
         user = User.query.get(user_id)
         if not user:
-            return {"message":"User not found"}, 404
+            return {"message": "User not found"}, 404
         user.email = email if email else user.email
         if password:
             user.password = hash_password(password)
         if pref_subjects:
             user.pref_subjects = pref_subjects
-        
+
         try:
             db.session.commit()
-            return {"message":"User Updated Successfully"}
+            return {"message": "User Updated Successfully"}
         except:
             db.session.rollback()
-            return {"message":"User Updation was Unsuccessfull, Please Try again with valid details"},500
-    
-    @auth_required('token')    
+            return {"message": "User Updation was Unsuccessfull, Please Try again with valid details"}, 500
+
+    @auth_required('token')
     def delete(self, user_id):
         user = User.query.get(user_id)
         if not user:
             return {"message": "User not found"}, 404
-        
+
         try:
             db.session.delete(user)
             db.session.commit()
@@ -125,35 +127,39 @@ class UserAPI(Resource):
 
 class UserListAPI(Resource):
     @auth_required('token')
-    @cache.cached(timeout=5, key_prefix='users_list')
+    @cache.cached(timeout=60, key_prefix=lambda: f"users_{request.args.get('search', '').strip().lower()}")
     @marshal_with(user_fields)
     def get(self):
-        users = User.query.all()
+        search = request.args.get('search', '').strip()
+        if search:
+            users = User.query.filter(~User.roles.any(Role.name == 'admin')).filter(
+                User.email.ilike(f"%{search}%")).all()
+        else:
+            users = User.query.filter(
+                ~User.roles.any(Role.name == 'admin')).all()
         return users
 
     def post(self):
         data = request.get_json()
         email = data.get("email")
         password = data.get("password")
-        pref_subjects = data.get("pref_subjects",[])
+        pref_subjects = data.get("pref_subjects", [])
         roles = ["user"]
-        print(pref_subjects)
-        
-        if User.query.filter_by(email = email).first():
-            return {"message":"User with this Email Already Exists!"},404
-        
+        if User.query.filter_by(email=email).first():
+            return {"message": "User with this Email Already Exists!"}, 404
+
         try:
             role_obj = Role.query.filter(Role.name.in_(roles)).all()
-            datastore.create_user(email = email, password = hash_password(password), pref_subjects = pref_subjects, roles = role_obj, active = True)
+            datastore.create_user(email=email, password=hash_password(
+                password), pref_subjects=pref_subjects, roles=role_obj, active=True)
             db.session.commit()
-            return {"message":"User added Successfully"}
+            cache.delete_memoized(UserListAPI.get)
+            return {"message": "User added Successfully"}
         except Exception as e:
             db.session.rollback()
-            print("Error while adding is:",str(e))
-            return {"message": "Error Adding User!"}, 404
+            return {"message": "Error Adding User!", }, 404
 
 
-        
 class SubjectAPI(Resource):
     @auth_required('token')
     @cache.memoize()
@@ -171,7 +177,6 @@ class SubjectAPI(Resource):
         data = request.get_json()
         name = data.get("name")
         description = data.get("description")
-
         subject = Subject.query.get(subject_id)
         if not subject:
             return jsonify({'message': 'Subject not Found'}), 404
@@ -180,6 +185,8 @@ class SubjectAPI(Resource):
         subject.description = description
         try:
             db.session.commit()
+            cache.delete_memoized(SubjectAPI.get, self, subject_id)
+            cache.delete_memoized(SubjectListAPI.get)
             return jsonify({'message': 'Succesfully Edited Subject Details'})
         except Exception as e:
             db.session.rollback()
@@ -194,6 +201,8 @@ class SubjectAPI(Resource):
         try:
             db.session.delete(subject)
             db.session.commit()
+            cache.delete_memoized(SubjectAPI.get, self, subject_id)
+            cache.delete_memoized(SubjectListAPI.get)
             return ({'message': 'Subject Deleted'})
         except:
             db.session.rollback()
@@ -202,7 +211,7 @@ class SubjectAPI(Resource):
 
 class SubjectListAPI(Resource):
     # @auth_required('token')
-    @cache.cached(timeout=1,key_prefix='subject_list')
+    @cache.cached(timeout=60, key_prefix=lambda: f"subjects_{request.args.get('search', '').strip().lower()}")
     @marshal_with(subject_fields)
     def get(self):
         search = request.args.get('search', '').strip()
@@ -223,8 +232,7 @@ class SubjectListAPI(Resource):
         try:
             db.session.add(subject)
             db.session.commit()
-            print(name)
-            print(description)
+            cache.delete_memoized(SubjectListAPI.get)
             return jsonify({'message': 'Subject Added'})
         except:
             db.session.rollback()
@@ -251,6 +259,8 @@ class ChapterAPI(Resource):
         try:
             db.session.delete(chapter)
             db.session.commit()
+            cache.delete_memoized(ChapterAPI.get, self, chapter_id)
+            cache.delete_memoized(ChapterListAPI.get)
             return jsonify({'message': 'Chapter Deleted'})
         except:
             db.session.rollback()
@@ -270,6 +280,8 @@ class ChapterAPI(Resource):
         chapter.description = description
         try:
             db.session.commit()
+            cache.delete_memoized(ChapterAPI.get, self, chapter_id)
+            cache.delete_memoized(ChapterListAPI.get)
             return jsonify({'message': 'Succesfully Edited Chapter Details'})
         except:
             db.session.rollback()
@@ -278,7 +290,7 @@ class ChapterAPI(Resource):
 
 class ChapterListAPI(Resource):
     @auth_required('token')
-    @cache.cached(timeout=1, key_prefix='chapters_list')
+    @cache.cached(timeout=60,key_prefix=lambda: f"chapters_{request.view_args.get('subject_id')}")
     @marshal_with(chapter_fields)
     def get(self, subject_id):
         chapters = Chapter.query.filter_by(subject_id=subject_id).all()
@@ -294,6 +306,7 @@ class ChapterListAPI(Resource):
         try:
             db.session.add(chapter)
             db.session.commit()
+            cache.delete_memoized(ChapterListAPI.get, self, subject_id)
             return jsonify({'message': 'Chapter Added'})
         except:
             db.session.rollback()
@@ -309,10 +322,11 @@ class QuizAPI(Resource):
         if not quiz:
             print("Quiz not Found")
             return jsonify({'message': 'Quiz not Found'}), 404
-        
-        visit = QuizAttendance.query.filter_by(user_id=current_user.id, quiz_id = quiz.id).first()
+
+        visit = QuizAttendance.query.filter_by(
+            user_id=current_user.id, quiz_id=quiz.id).first()
         if not visit:
-            nvisit = QuizAttendance(user_id = current_user.id, quiz_id = quiz.id)
+            nvisit = QuizAttendance(user_id=current_user.id, quiz_id=quiz.id)
             try:
                 db.session.add(nvisit)
                 db.session.commit()
@@ -320,9 +334,6 @@ class QuizAPI(Resource):
                 db.session.rollback()
                 return jsonify({'message': 'Error Adding attendance'}), 500
         return quiz
-
-            
-        
 
     @auth_required('token')
     def delete(self, quiz_id):
@@ -333,6 +344,8 @@ class QuizAPI(Resource):
         try:
             db.session.delete(quiz)
             db.session.commit()
+            cache.delete_memoized(QuizAPI.get, self, quiz_id)
+            cache.delete_memoized(QuizListAPI.get)
             return jsonify({'message': 'quiz Deleted'})
         except:
             db.session.rollback()
@@ -344,12 +357,12 @@ class QuizAPI(Resource):
         remarks = data.get("remarks")
         duration = data.get("duration")
         if not isinstance(duration, str) or not re.match(r'^\d{2}:\d{2}:\d{2}$', duration):
-            return {"message": "Duration must be in the format HH:MM:SS"},400
-        
+            return {"message": "Duration must be in the format HH:MM:SS"}, 400
+
         try:
-           duration = datetime.strptime(duration, '%H:%M:%S').time()
+            duration = datetime.strptime(duration, '%H:%M:%S').time()
         except ValueError:
-            return{"message":"Invalid Time Format"},401
+            return {"message": "Invalid Time Format"}, 401
         quiz = Quiz.query.get(quiz_id)
         if not quiz:
             return jsonify({'message': 'Quiz not Found'}), 404
@@ -358,6 +371,8 @@ class QuizAPI(Resource):
         quiz.duration = duration
         try:
             db.session.commit()
+            cache.delete_memoized(QuizAPI.get, self, quiz_id)
+            cache.delete_memoized(QuizListAPI.get)
             return jsonify({'message': 'Succesfully Edited Chapter Details'})
         except:
             db.session.rollback()
@@ -366,7 +381,7 @@ class QuizAPI(Resource):
 
 class QuizListAPI(Resource):
     @auth_required('token')
-    @cache.cached(timeout=1, key_prefix='Quiz_list')
+    @cache.cached(timeout=60,key_prefix=lambda: f"quiz_list_{request.view_args.get('chapter_id')}")
     @marshal_with(quiz_fields)
     def get(self, chapter_id):
         quizes = Quiz.query.filter_by(chapter_id=chapter_id).all()
@@ -377,20 +392,21 @@ class QuizListAPI(Resource):
         data = request.get_json()
         remarks = data.get("remarks")
         duration = data.get("duration")
-        
+
         if not isinstance(duration, str) or not re.match(r'^\d{2}:\d{2}:\d{2}$', duration):
-            return {"message": "Duration must be in the format HH:MM:SS"},400
-        
+            return {"message": "Duration must be in the format HH:MM:SS"}, 400
+
         try:
-           duration = datetime.strptime(duration, '%H:%M:%S').time()
+            duration = datetime.strptime(duration, '%H:%M:%S').time()
         except ValueError:
-            return{"message":"Invalid Time Format"},401
+            return {"message": "Invalid Time Format"}, 401
         quiz = Quiz(remarks=remarks, duration=duration,
                     chapter_id=chapter_id)
 
         try:
             db.session.add(quiz)
             db.session.commit()
+            cache.delete_memoized(QuizListAPI.get, self, chapter_id)
             print(f"Quiz {quiz.id} successfully committed.")
             # result = send_reminders.delay(quiz.id)
             # now = datetime.now(timezone('Asia/Kolkata'))
@@ -406,7 +422,6 @@ class QuizListAPI(Resource):
             return jsonify({'message': 'Error Adding Quiz'}), 500
 
 
-
 class QuestionAPI(Resource):
     @auth_required('token')
     @cache.memoize()
@@ -414,9 +429,9 @@ class QuestionAPI(Resource):
     def get(self, question_id):
         question = Questions.query.get(question_id)
         if not question:
-            return {"message":"Question Not Found"}
+            return {"message": "Question Not Found"}
         return question
-    
+
     @auth_required('token')
     def delete(self, question_id):
         question = Questions.query.get(question_id)
@@ -426,6 +441,7 @@ class QuestionAPI(Resource):
         try:
             db.session.delete(question)
             db.session.commit()
+            cache.delete_memoized(QuestionAPI.get, self, question_id)
             return jsonify({'message': 'Question Deleted'})
         except:
             db.session.rollback()
@@ -452,16 +468,18 @@ class QuestionAPI(Resource):
         question.option_4 = option_4
         question.correct_answer = correct_answer
         question.marks = marks
-        
+
         try:
             db.session.commit()
+            cache.delete_memoized(QuestionAPI.get, self, question_id)
             return jsonify({'message': 'Succesfully Edited Question'})
         except:
             db.session.rollback()
             return jsonify({'message': 'Error Editing Question'}), 500
 
-class AddQuestionAPI(Resource):     
-    def post(self,quiz_id):
+
+class AddQuestionAPI(Resource):
+    def post(self, quiz_id):
         data = request.get_json()
         statement = data.get("statement")
         option_1 = data.get("option_1")
@@ -470,25 +488,26 @@ class AddQuestionAPI(Resource):
         option_4 = data.get("option_4")
         correct_answer = data.get("correct_answer")
         marks = data.get("marks")
-        question  = Questions(quiz_id = quiz_id, statement=statement,option_1=option_1,option_2=option_2,option_3=option_3,option_4=option_4,correct_answer=correct_answer,marks=marks)
-        
+        question = Questions(quiz_id=quiz_id, statement=statement, option_1=option_1, option_2=option_2,
+                             option_3=option_3, option_4=option_4, correct_answer=correct_answer, marks=marks)
+
         try:
             db.session.add(question)
             db.session.commit()
-            return jsonify({'message':'Question Added'})
+            cache.delete_memoized(QuizAPI.get, quiz_id=quiz_id)
+            return jsonify({'message': 'Question Added'})
         except:
             db.session.rollback()
-            return jsonify({"message":"Error Adding question !"})
-    
+            return jsonify({"message": "Error Adding question !"})
+
 
 class SubmitQuizAPI(Resource):
-    def post(self,quiz_id):
+    def post(self, quiz_id):
         data = request.get_json()
         total_score = data.get("total_score")
-        # Check if user exists:
-        existing_user = Scores.query.filter_by(user_id = current_user.id, quiz_id = quiz_id).first()
-        
-        
+        existing_user = Scores.query.filter_by(
+            user_id=current_user.id, quiz_id=quiz_id).first()
+
         try:
             if existing_user:
                 existing_user.total_score = total_score
@@ -497,28 +516,27 @@ class SubmitQuizAPI(Resource):
                 db.session.commit()
                 return jsonify({'message': 'Score Updated'})
             else:
-                score = Scores(user_id = current_user.id, quiz_id = quiz_id, total_score = total_score, attempts = 1)
+                score = Scores(user_id=current_user.id, quiz_id=quiz_id,
+                               total_score=total_score, attempts=1)
                 db.session.add(score)
                 db.session.commit()
                 return jsonify({'message': 'Score Added'})
-                
+
         except:
             db.session.rollback()
             return jsonify({"message": "Error Adding Score !"})
-            
-    
-
 
 
 class CreateCSV(Resource):
     @auth_required('token')
     def post(self):
         task = user_quizCsv.delay(current_user.id)
-        return {'task_id':task.id}
+        return {'task_id': task.id}
+
 
 class GetCSV(Resource):
     # @auth_required('token')
-    def get(self,id):
+    def get(self, id):
         result = AsyncResult(id)
         if result.ready():
             relative_path = f'./backend/user_downloads/{result.result}'
@@ -527,10 +545,10 @@ class GetCSV(Resource):
             print(f"Checking relative path: {relative_path}")
             return send_file(file_path, as_attachment=True)
         else:
-            return {'message':'Report is not ready yet'},405
-        
+            return {'message': 'Report is not ready yet'}, 405
+
     @auth_required('token')
-    def post(self,id):
+    def post(self, id):
         result = AsyncResult(id)
         if result.ready():
             relative_path = f'./backend/user_downloads/{result.result}'
@@ -539,23 +557,27 @@ class GetCSV(Resource):
             print(f"Checking relative path: {relative_path}")
             return send_file(file_path, as_attachment=True)
         else:
-            return {'message':'Report is not ready yet'},405
-        
-        
+            return {'message': 'Report is not ready yet'}, 405
+
+
 class AdminSummaryTopScores(Resource):
+    @cache.cached(timeout=60, key_prefix="adminTop_scores")
     def get(self):
         result = db.session.query(
             Subject.name.label('subject'),
-            db.func.coalesce(db.func.max(Scores.total_score), 0).label('top_score')
+            db.func.coalesce(db.func.max(Scores.total_score),
+                             0).label('top_score')
         ).outerjoin(Chapter, Chapter.subject_id == Subject.id) \
          .outerjoin(Quiz, Quiz.chapter_id == Chapter.id) \
          .outerjoin(Scores, Scores.quiz_id == Quiz.id) \
          .group_by(Subject.name) \
          .order_by(Subject.name).all()
         print(result)
-        return [{'subject':s,'top_score':t} for s,t in result]
+        return [{'subject': s, 'top_score': t} for s, t in result]
+
 
 class AdminSummaryUserSubject(Resource):
+    @cache.cached(timeout=66, key_prefix="adminSubj_attempts")
     def get(self):
         results = db.session.query(
             Subject.name.label('subject'),
@@ -568,8 +590,10 @@ class AdminSummaryUserSubject(Resource):
         print(results)
         return [{'subject': s, 'attempts': a} for s, a in results]
 
+
 class UserSummaryQuizStats(Resource):
-    def get(self,user_id):
+    @cache.cached(timeout=120, key_prefix=lambda: f"userQuizStats_{request.view_args.get('user_id')}")
+    def get(self, user_id):
         quizCount = db.session.query(
             Subject.name.label('subject'),
             db.func.count(Quiz.id).label('count')
@@ -587,20 +611,20 @@ class UserSummaryQuizStats(Resource):
             .group_by(extract('month', Scores.time)) \
             .order_by(extract('month', Scores.time)).all()
 
-
         return {
-            'quizCount' :[{'subject':s,'count':c} for s,c in quizCount],
+            'quizCount': [{'subject': s, 'count': c} for s, c in quizCount],
             'attemptCount': [{'month': int(m), 'count': c} for m, c in attemptCount]
 
         }
 
-api.add_resource(AdminSummaryTopScores,"/admin/top-scores")
-api.add_resource(AdminSummaryUserSubject, "/admin/subject-attempts")
-api.add_resource(UserSummaryQuizStats,"/user/<int:user_id>/quiz-stats")
 
-api.add_resource(UserAPI,"/users/<int:user_id>")
-api.add_resource(UserListAPI,"/users")
-    
+api.add_resource(AdminSummaryTopScores, "/admin/top-scores")
+api.add_resource(AdminSummaryUserSubject, "/admin/subject-attempts")
+api.add_resource(UserSummaryQuizStats, "/user/<int:user_id>/quiz-stats")
+
+api.add_resource(UserAPI, "/users/<int:user_id>")
+api.add_resource(UserListAPI, "/users")
+
 api.add_resource(SubjectAPI, "/subjects/<int:subject_id>")
 api.add_resource(SubjectListAPI, "/subjects")
 
@@ -614,7 +638,7 @@ api.add_resource(QuizListAPI, "/quizes/<int:chapter_id>")
 
 api.add_resource(QuestionAPI, "/question/<int:question_id>")
 api.add_resource(AddQuestionAPI, "/add/question/<int:quiz_id>")
-api.add_resource(SubmitQuizAPI,"/SubmitQuiz/<int:quiz_id>")
+api.add_resource(SubmitQuizAPI, "/SubmitQuiz/<int:quiz_id>")
 
-api.add_resource(CreateCSV,"/createCSV")
-api.add_resource(GetCSV,"/getCSV/<string:id>")
+api.add_resource(CreateCSV, "/createCSV")
+api.add_resource(GetCSV, "/getCSV/<string:id>")

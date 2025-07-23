@@ -3,7 +3,8 @@
         <Sidebar />
 
         <div class="main--content">
-            <Topbar :pname="chapters.length ? chapters[0]['subject.name'] : ''" :count="chapters.length" />
+            <Topbar :pname="chapters.length ? chapters[0]['subject.name'] : ''" :count="chapters.length"
+                @search-subject="fetchChapters_Search" />
 
             <div class="card--container">
                 <h3 class="main--title">Chapters</h3>
@@ -117,6 +118,7 @@
 <script>
 import Sidebar from '@/components/sidebar.vue'
 import Topbar from '@/components/Topbar.vue'
+import axios from 'axios'
 
 
     export default {
@@ -134,6 +136,16 @@ import Topbar from '@/components/Topbar.vue'
             }
         },
         methods: {
+            async fetchChapters_Search(searchTerm) {
+                await axios.get(`http://localhost:5000/api/chapters/${this.sid}?search=${searchTerm}`,{
+                    headers:{
+                        'Authentication-Token': JSON.parse(localStorage.getItem('user')).token
+                    }
+                })
+                    .then(res => {
+                        this.chapters =  res.data;
+                    });
+            },
             
             async fetchChapters(){
                 try{

@@ -649,6 +649,12 @@ padding: 16px;
     color: black;
 }
 
+.chck-boxes{
+    display: flex;
+    gap: 10px;
+    margin-right: 20px;
+}
+
 .user--info{
     display: flex;
     align-items: center;
@@ -695,6 +701,7 @@ padding: 16px;
     background: #fff;
     padding: 2rem;
     border-radius: 10px;
+    margin: 10px 0px 2px 0px;
 
 }
 

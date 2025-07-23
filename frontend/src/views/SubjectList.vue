@@ -1,9 +1,9 @@
 <template>
     <div class="dash-camp-body">
-       <Sidebar />
+        <Sidebar />
 
         <div class="main--content">
-            <Topbar />
+            <Topbar @search-subject="fetchSubjects_Search" />
 
             <div class="card--container">
                 <h3 class="main--title">Subjects</h3>
@@ -31,7 +31,7 @@
                         <div>
                             <button class="abtn" style="text-decoration: none; color: chocolate;"
                                 @click="$router.push({ name: 'ChapterList', params: { subject_id: subject.id }, query: { subject_name: subject.name , totalChapters: subject.chapters.length} })">
-                                
+
                                 View More
                             </button>
                         </div>
@@ -120,7 +120,7 @@
 <script>
 import Sidebar from '@/components/sidebar.vue';
 import Topbar from '@/components/Topbar.vue';
-
+import axios from 'axios';
 export default {
         name:'SubjectList',
         components:{
@@ -136,6 +136,12 @@ export default {
             }
         },
     methods: {
+        async fetchSubjects_Search(searchTerm) {
+            await axios.get(`http://localhost:5000/api/subjects?search=${searchTerm}`)
+                .then(res => {
+                    this.subjects = res.data;
+                });
+        },
         async fetchSubjects() {
             try {
                 const res = await fetch('http://localhost:5000/' + '/api/subjects', {

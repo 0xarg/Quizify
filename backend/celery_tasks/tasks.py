@@ -184,10 +184,4 @@ def user_quizCsv(self,user_id):
         print(f"Error while sending the export done alert: {e}")
         
     return filename
-    
-    
-    
-    
-    with open(Fpath,"wb") as file:
-        wtr = csv.wtr
-    
+

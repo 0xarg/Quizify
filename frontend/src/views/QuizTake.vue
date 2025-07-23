@@ -76,9 +76,6 @@ export default {
             const duration = this.DuraToMs(this.quiz.duration);
             this.remainingTime = duration
             this.fTime = this.FTime(this.remainingTime)
-            console.log(this.quiz.duration)
-            console.log(duration)
-            console.log(this.remainingTime)
 
             this.autoSub = setTimeout(this.submitQuiz, duration)
 

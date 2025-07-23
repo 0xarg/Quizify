@@ -6,13 +6,15 @@
             <span>{{ count }}</span>
             <!-- <h3>Ratings</h3> -->
         </div>
+
         <div class="user--info">
+            
             <div class="search--box">
 
                 <i class="fa-solid fa-search">
 
                 </i>
-                <input type="text" class="sin" placeholder="Search Subject" v-model="search" @input="handleSearch" />
+                <input type="text" class="sin" placeholder="Search" v-model="search" @input="handleSearch" />
 
             </div>
 

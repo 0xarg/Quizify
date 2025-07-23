@@ -7,14 +7,14 @@ celery_app = app.extensions["celery"]
 @celery_app.on_after_configure.connect  # --> basically lifecycle like vue
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(hour=15, minute=19),
+        crontab(hour=10, minute=15),
         send_reminders.s(),
         name="Daily Quiz Reminder"
     )
     sender.add_periodic_task(
-        crontab(hour=15, minute=17),
+        crontab(hour=10, minute=15),
         monthly_report.s(),
-        name="Daily Quiz Reminder"
+        name="Monthly Quiz Report"
     )
     # sender.add_periodic_task(
     #     10.0,
