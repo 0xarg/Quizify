@@ -64,7 +64,7 @@
                         </div>
 
                     </div>
-                    <div class="payment--card light-green">
+                    <div class="payment--card light-green" v-if="$store.state.roles == 'admin'">
                         <div class="card--header">
                             <div class="amount">
                                 <span class="title">
