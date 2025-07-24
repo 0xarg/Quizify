@@ -1,28 +1,28 @@
 <template>
- 
+
     <div class="quiz-wrapper">
         <div v-if="!isSubmitted">
             <section class="quiz-info-card">
-                <h2>📖 Quiz: {{ quiz_id }}</h2>
+                <h2>{{ quiz.name }}</h2>
                 <p>Duration: {{ quiz.duration }}</p>
                 <p>Total Marks: {{ TotalMarks }}</p>
                 <p>Duration: {{ quiz.duration }}</p>
 
             </section>
-            <section  class=" quiz-info-card-buttons button-section">
+            <section class=" quiz-info-card-buttons button-section">
                 <div class="timer">
                     <h5>{{ fTime }}</h5>
                 </div>
                 <div class="button-section">
-                    <button class="test-sbmt" @click="submitQuiz">Sumbit</button>
+                    <button class="test-sbmt" @click="submitQuiz">Submit</button>
                 </div>
             </section>
         </div>
         <div v-if="isSubmitted">
             <section class="quiz-info-card">
-                <h3>🎉 Quiz Completed!</h3>
-                <p>⭐ You scored {{ AcheivedMarks }} out of {{ TotalMarks }}</p>
-                <p>📋 Submission Status: {{ status }}</p>
+                <h3> Quiz Completed!</h3>
+                <p> You scored {{ AcheivedMarks }} out of {{ TotalMarks }}</p>
+                <p> Submission Status: {{ status }}</p>
             </section>
             <section class=" quiz-info-card-buttons button-section">
                 <button class="test-sbmt" @click="exitExam">Back to All Quizes</button>
@@ -32,10 +32,11 @@
         <main class="quiz-body">
 
             <section class="quiz-question" v-for="(question, qIndex) in quiz.questions" :key="question.id">
-                Q{{ question.id }}. {{ question.statement }} ({{ question.marks }} Mark)
+                Q{{ qIndex+1 }}. {{ question.statement }} ({{ question.marks }} Mark)
                 <form class="options">
-                    <label v-for="(option, oIndex) in question.options" :key="oIndex"><input type="radio" name="q1"
-                            :name="'question-' + qIndex" :value="option" v-model="selectedOptions[qIndex]" />  {{ option
+                    <label v-for="(option, oIndex) in question.options" :key="oIndex"><input
+                            v-bind:disabled="isSubmitted ? true : null" type="radio" name="q1"
+                            :name="'question-' + qIndex" :value="option" v-model="selectedOptions[qIndex]" /> {{ option
                         }}</label>
                 </form>
             </section>

@@ -102,7 +102,7 @@
 
                 </div>
             </div>
-            <div class="card--container">
+            <div class="card--container" v-if="$store.state.roles == 'admin'">
                 <div class="chck-boxes">
                     <label for="filter_User">Show Users Only</label>
                     <input type="checkbox" v-model="isChecked" name="filter_User" id="">
@@ -203,7 +203,7 @@
                 </div>
             </div>
 
-            <div class="tabular--wrapper">
+            <div class="tabular--wrapper" v-if="$store.state.roles == 'admin'">
                 <h3 class="main--title"> Users</h3>
                 <div class="table--container">
                     <table>
@@ -218,7 +218,7 @@
                             <tr v-for="user in users" :key="user.id">
                                 <td>{{ user.email.split('@')[0] }}</td>
                                 <td>{{ user.email }}</td>
-                                <td> <button class="red-btn">Delete</button></td>
+                                <td> <button class="red-btn" @click="deleteUser(user.id)">Delete</button></td>
                             </tr>
                         </tbody>
 
@@ -300,6 +300,19 @@ export default {
             }
 
 
+        },
+
+        async deleteUser(user_id){
+            try {
+                await axios.delete(`http://localhost:5000/api/users/${user_id}`,{
+                    headers:{
+                        'Authentication-Token': JSON.parse(localStorage.getItem('user')).token
+                    }
+                });
+                await this.getAllUsers()  
+            } catch (error) {
+                console.error(error);
+            }
         },
 
 

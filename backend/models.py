@@ -49,6 +49,7 @@ class Chapter(db.Model):
     
 class Quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True)
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'))
     date = db.Column(db.DateTime, index = True, default = datetime.now())
     duration = db.Column(db.Time, nullable = False)

@@ -11,7 +11,7 @@
                     <div v-for="quiz in quizes" :key="quiz.id" class="camp--card">
                         <div class="card--header">
                             <div class="amount">
-                                <span class="title">Quiz-{{ quiz.id }}</span>
+                                <span class="title">{{ quiz.name }}</span>
                                 <span class="amount--value-camp"></span>
                                 <span class="card--detail">{{ quiz.remarks }}</span>
                                 <br>
@@ -68,6 +68,10 @@
                     </div>
                     <div class="modal-body">
                         <div class="mb-2">
+                            <label for="title" class="col-form-label">Name</label>
+                            <input type="text" class="form-control" id="title" name="title" v-model="name" />
+                        </div>
+                        <div class="mb-2">
                             <label for="title" class="col-form-label">Remarks</label>
                             <input type="text" class="form-control" id="title" name="title" v-model="remarks" />
                         </div>
@@ -97,6 +101,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <div class="mb-2">
+                            <label class="col-form-label">Name</label>
+                            <input type="text" class="form-control" name="remarks" v-model="name">
+                        </div>
                         <div class="mb-2">
                             <label class="col-form-label">Remarks</label>
                             <input type="text" class="form-control" name="remarks" v-model="remarks">
@@ -133,6 +141,7 @@ import Topbar from '@/components/Topbar.vue';
         data() {
             return{
                 quizes:[],
+                name: null,
                 remarks: null,
                 duration:null,
                 quiz_id:null,
@@ -162,11 +171,12 @@ import Topbar from '@/components/Topbar.vue';
                             'Content-Type': 'application/json',
                             'Authentication-Token': JSON.parse(localStorage.getItem('user')).token
                         },
-                        body: JSON.stringify({ remarks: this.remarks, duration: this.duration })
+                        body: JSON.stringify({ remarks: this.remarks, name: this.name, duration: this.duration })
                     })
                     if (res.ok) {
                         document.querySelector('#exampleModal .btn-close').click();
                         this.remarks = null;
+                        this.name = null;
                         this.duration = null;
                         await this.fetchQuiz();
                     } else {
@@ -181,6 +191,7 @@ import Topbar from '@/components/Topbar.vue';
             },
             async changeInit(quiz) {
                 this.remarks = quiz.remarks;
+                this.name = quiz.name;
                 this.duration = quiz.duration;
                 this.quiz_id = quiz.id;
             },
@@ -192,11 +203,12 @@ import Topbar from '@/components/Topbar.vue';
                             'Content-Type': 'application/json',
                             'Authentication-Token': JSON.parse(localStorage.getItem('user')).token
                         },
-                        body: JSON.stringify({ remarks: this.remarks, duration: this.duration.toString() })
+                        body: JSON.stringify({ remarks: this.remarks,name:this.name, duration: this.duration.toString() })
                     })
                     if (res.ok) {
                         document.querySelector('#changeModal .btn-close').click();
                         this.remarks = null;
+                        this.name = null;
                         this.duration = null;
                         this.quiz_id = null;
                         await this.fetchQuiz();

@@ -6,7 +6,7 @@
             <div id="sidebar-AdminQuiz">
                 <div id="desc-AdminQuiz">
                     <h2>Exam: </h2>
-                    <h2>Quiz-{{ quiz.id }}</h2>
+                    <h2>{{ quiz.name }}</h2>
                     <h6>Chapter : </h6>
                     <h6>{{ quiz["chapter.name"] }}</h6>
                     <h6>Duration : </h6>
@@ -21,7 +21,7 @@
 
             <div id="quiz-AdminQuiz">
                 <div id="ques-box-AdminQuiz" v-for="question in quiz.questions" :key="question.id">
-                    <h5>Q{{ question.id }}. {{ question.statement }} ({{ question.marks }} Mark)</h5>
+                    <h5>Q. {{ question.statement }} ({{ question.marks }} Mark)</h5>
 
                     <ol>
                         <li v-for="(option, index) in question.options" :key="index" :class="{

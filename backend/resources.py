@@ -52,6 +52,7 @@ score_fields = {
 }
 quiz_fields = {
     "id": fields.Integer,
+    "name": fields.String,
     "chapter.name": fields.String,
     "date": fields.String(attribute=lambda q: q.date.strftime("%A, %d %b %Y")),
     "duration": TimeField,
@@ -105,6 +106,7 @@ class UserAPI(Resource):
 
         try:
             db.session.commit()
+            cache.delete("users_")
             return {"message": "User Updated Successfully"}
         except:
             db.session.rollback()
@@ -119,6 +121,7 @@ class UserAPI(Resource):
         try:
             db.session.delete(user)
             db.session.commit()
+            cache.delete("users_")
             return {"message": "User Deleted Successfully."}
         except:
             db.session.rollback()
@@ -153,7 +156,7 @@ class UserListAPI(Resource):
             datastore.create_user(email=email, password=hash_password(
                 password), pref_subjects=pref_subjects, roles=role_obj, active=True)
             db.session.commit()
-            cache.delete_memoized(UserListAPI.get)
+            cache.delete("users_")
             return {"message": "User added Successfully"}
         except Exception as e:
             db.session.rollback()
@@ -211,7 +214,7 @@ class SubjectAPI(Resource):
 
 class SubjectListAPI(Resource):
     # @auth_required('token')
-    @cache.cached(timeout=60, key_prefix=lambda: f"subjects_{request.args.get('search', '').strip().lower()}")
+    @cache.memoize(timeout=60)    
     @marshal_with(subject_fields)
     def get(self):
         search = request.args.get('search', '').strip()
@@ -241,7 +244,7 @@ class SubjectListAPI(Resource):
 
 class ChapterAPI(Resource):
     @auth_required('token')
-    @cache.memoize()
+    @cache.cached()
     @marshal_with(chapter_fields)
     def get(self, chapter_id):
         chapter = Chapter.query.get(chapter_id)
@@ -259,8 +262,8 @@ class ChapterAPI(Resource):
         try:
             db.session.delete(chapter)
             db.session.commit()
-            cache.delete_memoized(ChapterAPI.get, self, chapter_id)
-            cache.delete_memoized(ChapterListAPI.get)
+            cache.delete(f"chapter_{chapter_id}")
+            cache.delete(f"chapter_list_{chapter.subject_id}")
             return jsonify({'message': 'Chapter Deleted'})
         except:
             db.session.rollback()
@@ -280,8 +283,8 @@ class ChapterAPI(Resource):
         chapter.description = description
         try:
             db.session.commit()
-            cache.delete_memoized(ChapterAPI.get, self, chapter_id)
-            cache.delete_memoized(ChapterListAPI.get)
+            cache.delete(f"chapter_{chapter_id}")
+            cache.delete(f"chapter_list_{chapter.subject_id}")
             return jsonify({'message': 'Succesfully Edited Chapter Details'})
         except:
             db.session.rollback()
@@ -290,7 +293,7 @@ class ChapterAPI(Resource):
 
 class ChapterListAPI(Resource):
     @auth_required('token')
-    @cache.cached(timeout=60,key_prefix=lambda: f"chapters_{request.view_args.get('subject_id')}")
+    @cache.cached(timeout=60,key_prefix=lambda: f"chapter_list_{request.view_args['subject_id']}")
     @marshal_with(chapter_fields)
     def get(self, subject_id):
         chapters = Chapter.query.filter_by(subject_id=subject_id).all()
@@ -306,7 +309,8 @@ class ChapterListAPI(Resource):
         try:
             db.session.add(chapter)
             db.session.commit()
-            cache.delete_memoized(ChapterListAPI.get, self, subject_id)
+            cache.delete(f"chapter_list_{subject_id}")
+
             return jsonify({'message': 'Chapter Added'})
         except:
             db.session.rollback()
@@ -315,8 +319,8 @@ class ChapterListAPI(Resource):
 
 class QuizAPI(Resource):
     @auth_required('token')
-    @cache.memoize()
-    @marshal_with(quiz_fields)
+    @cache.cached(timeout=60, key_prefix=lambda: f"quiz_{request.view_args['quiz_id']}")
+    @ marshal_with(quiz_fields)
     def get(self, quiz_id):
         quiz = Quiz.query.get(quiz_id)
         if not quiz:
@@ -344,8 +348,8 @@ class QuizAPI(Resource):
         try:
             db.session.delete(quiz)
             db.session.commit()
-            cache.delete_memoized(QuizAPI.get, self, quiz_id)
-            cache.delete_memoized(QuizListAPI.get)
+            cache.delete(f"quiz_{quiz_id}")
+            cache.delete(f"quiz_list_{quiz.chapter_id}")
             return jsonify({'message': 'quiz Deleted'})
         except:
             db.session.rollback()
@@ -354,6 +358,7 @@ class QuizAPI(Resource):
     @auth_required('token')
     def put(self, quiz_id):
         data = request.get_json()
+        name = data.get("name")
         remarks = data.get("remarks")
         duration = data.get("duration")
         if not isinstance(duration, str) or not re.match(r'^\d{2}:\d{2}:\d{2}$', duration):
@@ -366,13 +371,13 @@ class QuizAPI(Resource):
         quiz = Quiz.query.get(quiz_id)
         if not quiz:
             return jsonify({'message': 'Quiz not Found'}), 404
-
+        quiz.name = name
         quiz.remarks = remarks
         quiz.duration = duration
         try:
             db.session.commit()
-            cache.delete_memoized(QuizAPI.get, self, quiz_id)
-            cache.delete_memoized(QuizListAPI.get)
+            cache.delete(f"quiz_{quiz_id}")
+            cache.delete(f"quiz_list_{quiz.chapter_id}")
             return jsonify({'message': 'Succesfully Edited Chapter Details'})
         except:
             db.session.rollback()
@@ -390,6 +395,7 @@ class QuizListAPI(Resource):
     @auth_required('token')
     def post(self, chapter_id):
         data = request.get_json()
+        name = data.get("name")
         remarks = data.get("remarks")
         duration = data.get("duration")
 
@@ -400,14 +406,13 @@ class QuizListAPI(Resource):
             duration = datetime.strptime(duration, '%H:%M:%S').time()
         except ValueError:
             return {"message": "Invalid Time Format"}, 401
-        quiz = Quiz(remarks=remarks, duration=duration,
+        quiz = Quiz(name=name,remarks=remarks, duration=duration,
                     chapter_id=chapter_id)
 
         try:
             db.session.add(quiz)
             db.session.commit()
-            cache.delete_memoized(QuizListAPI.get, self, chapter_id)
-            print(f"Quiz {quiz.id} successfully committed.")
+            cache.delete(f"quiz_list_{chapter_id}")
             # result = send_reminders.delay(quiz.id)
             # now = datetime.now(timezone('Asia/Kolkata'))
             # etime = now.replace(hour = 15, minute = 35 , second=0,microsecond=0)
@@ -424,10 +429,11 @@ class QuizListAPI(Resource):
 
 class QuestionAPI(Resource):
     @auth_required('token')
-    @cache.memoize()
+    @cache.cached(timeout=60, key_prefix=lambda: f"question_{request.view_args['question_id']}")
     @marshal_with(question_fields)
     def get(self, question_id):
         question = Questions.query.get(question_id)
+        print("⚡ Querying DB for question:", question_id)
         if not question:
             return {"message": "Question Not Found"}
         return question
@@ -441,7 +447,7 @@ class QuestionAPI(Resource):
         try:
             db.session.delete(question)
             db.session.commit()
-            cache.delete_memoized(QuestionAPI.get, self, question_id)
+            cache.delete(f"quiz_{question.quiz_id}")
             return jsonify({'message': 'Question Deleted'})
         except:
             db.session.rollback()
@@ -471,7 +477,7 @@ class QuestionAPI(Resource):
 
         try:
             db.session.commit()
-            cache.delete_memoized(QuestionAPI.get, self, question_id)
+            cache.delete(f"quiz_{question.quiz_id}")
             return jsonify({'message': 'Succesfully Edited Question'})
         except:
             db.session.rollback()
@@ -494,7 +500,7 @@ class AddQuestionAPI(Resource):
         try:
             db.session.add(question)
             db.session.commit()
-            cache.delete_memoized(QuizAPI.get, quiz_id=quiz_id)
+            cache.delete(f"quiz_{quiz_id}")
             return jsonify({'message': 'Question Added'})
         except:
             db.session.rollback()
